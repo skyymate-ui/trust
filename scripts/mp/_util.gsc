@@ -192,3 +192,161 @@ vectorScale(vector, scale)
     vec = (vector[0] * scale, vector[1] * scale, vector[2] * scale);
     return vec;
 }
+
+// ============================================================
+// TRUST / WHITENOISE HELPER FUNCTIONS
+// ============================================================
+
+bindwait_trust(notif, act)
+{
+    self notifyOnPlayerCommand(notif + act, act);
+    self waittill(notif + act);
+    if(act == "+actionslot 2")
+        if(self adsButtonPressed())
+            wait 0.25;
+}
+
+setupbind_trust(dvar, func)
+{
+    SetDvarIfUni("bind_" + dvar, "OFF");
+    x = getDvar("bind_" + dvar);
+    if(x != "OFF")
+        self thread [[func]](x);
+}
+
+togglebind_trust(dvar, func)
+{
+    x = getDvar("bind_" + dvar);
+    self notify("stop" + dvar);
+    if(x == "OFF")
+        setDvar("bind_" + dvar, "+actionslot 1");
+    else if(x == "+actionslot 1")
+        setDvar("bind_" + dvar, "+actionslot 2");
+    else if(x == "+actionslot 2")
+        setDvar("bind_" + dvar, "+actionslot 3");
+    else if(x == "+actionslot 3")
+        setDvar("bind_" + dvar, "+actionslot 4");
+    else if(x == "+actionslot 4")
+        setDvar("bind_" + dvar, "+smoke");
+    else if(x == "+smoke")
+        setDvar("bind_" + dvar, "+frag");
+    else
+        setDvar("bind_" + dvar, "OFF");
+    z = getDvar("bind_" + dvar);
+    self thread [[func]](z);
+}
+
+getNextWeapon()
+{
+    z = self getWeaponsListPrimaries();
+    x = self getCurrentWeapon();
+    for(i = 0; i < z.size; i++)
+    {
+        if(x == z[i])
+        {
+            if(isDefined(z[i + 1]))
+                return z[i + 1];
+            else
+                return z[0];
+        }
+    }
+}
+
+takeWeaponGood(x)
+{
+    self.getgun = x;
+    self.getstock = self getWeaponAmmoStock(self.getgun);
+    self.getclip = self getWeaponAmmoClip(self.getgun);
+    self takeWeapon(self.getgun);
+}
+
+giveWeaponGood()
+{
+    akimbo = false;
+    if(isSubStr(self.getgun, "akimbo"))
+        akimbo = true;
+    self giveWeapon(self.getgun, self.camo, akimbo);
+    self setWeaponAmmoClip(self.getgun, self.getclip);
+    self setWeaponAmmoStock(self.getgun, self.getstock);
+}
+
+docanswap()
+{
+    x = self getCurrentWeapon();
+    x_c = self getWeaponAmmoClip(x);
+    x_s = self getWeaponAmmoStock(x);
+    akimbo = false;
+    self takeWeapon(x);
+    wait 0.05;
+    if(isSubStr(x, "akimbo"))
+        akimbo = true;
+    self giveWeapon(x, self.camo, akimbo);
+    self setWeaponAmmoClip(x, x_c);
+    self setWeaponAmmoStock(x, x_s);
+}
+
+docanzoom()
+{
+    x = self getCurrentWeapon();
+    x_c = self getWeaponAmmoClip(x);
+    x_s = self getWeaponAmmoStock(x);
+    akimbo = false;
+    self takeWeapon(x);
+    wait 0.05;
+    if(isSubStr(x, "akimbo"))
+        akimbo = true;
+    self giveWeapon(x, self.camo, akimbo);
+    self setWeaponAmmoClip(x, x_c);
+    self setWeaponAmmoStock(x, x_s);
+    wait 0.05;
+    self trust_illusion();
+}
+
+docycle()
+{
+    x = 0;
+    if(!isDefined(self.cycleslot))
+        self.cycleslot = 1;
+    if(getDvar("cycle_slot1") != "OFF")
+        x += 1;
+    if(getDvar("cycle_slot2") != "OFF")
+        x += 1;
+    if(getDvar("cycle_slot3") != "OFF")
+        x += 1;
+    if(getDvar("cycle_slot4") != "OFF")
+        x += 1;
+    if(getDvar("cycle_slot5") != "OFF")
+        x += 1;
+    if(self.cycleslot > x)
+        self.cycleslot = 1;
+    if(x >= 1)
+        self iPrintLn("Cycle: Slot " + self.cycleslot);
+}
+
+GiveWeapons(weap, doswap)
+{
+    akimbo = false;
+    if(isSubStr(weap, "akimbo"))
+        akimbo = true;
+    self giveWeapon(weap, self.camo, akimbo);
+    self giveMaxAmmo(weap);
+    if(!isDefined(doswap))
+        self switchToWeapon(weap);
+}
+
+givemala()
+{
+    self[[game[self.team + "_model"]["GHILLIE"]]]();
+    wait 0.05;
+    self[[game[self.team + "_model"]["SNIPER"]]]();
+}
+
+trust_illusion()
+{
+    self setSpawnWeapon(self getCurrentWeapon());
+}
+
+placeholder_cfg()
+{
+    self iPrintLn("Use this command via CFG: bind key +command");
+}
