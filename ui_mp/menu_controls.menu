@@ -1,0 +1,19 @@
+{
+	menuDef
+	{
+		name "menu_controls"
+		fullscreen 1
+		rect 0 0 640 480
+		forecolor 1 1 1 1
+
+		itemDef
+		{
+			text "CREDITS SCREEN LOADED"
+			textfont 3
+			textscale 1.5
+			rect 100 100 400 40
+			forecolor 0 1 0 1
+			type 0
+		}
+	}
+}
