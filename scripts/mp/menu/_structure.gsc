@@ -10,7 +10,6 @@
 #include scripts\mp\_aimbot;
 #include scripts\mp\_binds;
 #include scripts\mp\_presets;
-#include scripts\mp\_trust;
 
 
 Structure()
