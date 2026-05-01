@@ -1293,7 +1293,7 @@ canswapcfg_t()
     {
         self bindwait_trust("canswapcfg", "+canswap");
         if(!self isInMenu())
-            self docanswap();
+            self docanswap_trust();
     }
 }
 
@@ -1303,7 +1303,7 @@ canzoomcfg_t()
     {
         self bindwait_trust("canzoomcfg", "+canzoom");
         if(!self isInMenu())
-            self docanzoom();
+            self docanzoom_trust();
     }
 }
 

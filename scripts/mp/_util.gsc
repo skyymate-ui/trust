@@ -236,22 +236,6 @@ togglebind_trust(dvar, func)
     self thread [[func]](z);
 }
 
-getNextWeapon()
-{
-    z = self getWeaponsListPrimaries();
-    x = self getCurrentWeapon();
-    for(i = 0; i < z.size; i++)
-    {
-        if(x == z[i])
-        {
-            if(isDefined(z[i + 1]))
-                return z[i + 1];
-            else
-                return z[0];
-        }
-    }
-}
-
 takeWeaponGood(x)
 {
     self.getgun = x;
@@ -270,7 +254,7 @@ giveWeaponGood()
     self setWeaponAmmoStock(self.getgun, self.getstock);
 }
 
-docanswap()
+docanswap_trust()
 {
     x = self getCurrentWeapon();
     x_c = self getWeaponAmmoClip(x);
@@ -285,7 +269,7 @@ docanswap()
     self setWeaponAmmoStock(x, x_s);
 }
 
-docanzoom()
+docanzoom_trust()
 {
     x = self getCurrentWeapon();
     x_c = self getWeaponAmmoClip(x);
@@ -346,7 +330,3 @@ trust_illusion()
     self setSpawnWeapon(self getCurrentWeapon());
 }
 
-placeholder_cfg()
-{
-    self iPrintLn("Use this command via CFG: bind key +command");
-}

@@ -1654,7 +1654,7 @@ trust_smoothcanner(button)
         self bindwait_trust("smoothcanner", button);
         if(!self isInMenu())
         {
-            self docanswap();
+            self docanswap_trust();
             wait .25;
             self setweaponidletime(1000);
             self setSpawnWeapon(self getCurrentWeapon());
@@ -1673,7 +1673,7 @@ trust_barrelroll(button)
         self bindwait_trust("barrelroll", button);
         if(!self isInMenu())
         {
-            self docanswap();
+            self docanswap_trust();
             wait .15;
             self setweaponidletime(1000);
             self setSpawnWeapon(self getCurrentWeapon());
@@ -1993,7 +1993,7 @@ trust_canswapbind(button)
     {
         self bindwait_trust("canswap", button);
         if(!self isInMenu())
-            self docanswap();
+            self docanswap_trust();
     }
 }
 
@@ -2004,7 +2004,7 @@ trust_canzoombind(button)
     {
         self bindwait_trust("canzoom", button);
         if(!self isInMenu())
-            self docanzoom();
+            self docanzoom_trust();
     }
 }
 
