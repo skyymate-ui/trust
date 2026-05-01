@@ -1,0 +1,2 @@
+// xpbar_dvar.gsc — runs on the client before menus load
+registerClientDvar( "ui_hideXPBar", "0", DVAR_BOOL );

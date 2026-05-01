@@ -1,0 +1,89 @@
+#include "ui/menudef.h"
+#include "ui_mp/main.inc"
+#include "ui_mp/pc_options.inc"
+
+#define MENU_NAME									"controls_multi"
+#define MENU_TITLE									"Binds *TEMP, V2 WILL BE BETTER*"
+
+#undef CHOICE_GROUP
+#define CHOICE_GROUP								MENU_NAME
+
+#define CLOSE_MENUS \
+	name "controls_multi"
+	close "main_controls"; \
+	close "main_options"; \
+	close "options_control_defaults"; \
+	close "options_graphics"; \
+	close "options_graphics_defaults"; \
+	close "options_graphics_texture"; \
+	close "pc_options_actions"; \
+	close "pc_options_advanced_video"; \
+	close "pc_options_audio"; \
+	close "pc_options_controls"; \
+	close "pc_options_game"; \
+	close "pc_options_movement"; \
+	close "pc_options_video";
+
+#define ON_MENU_OPEN \
+	CLOSE_MENUS										\
+	setLocalVarBool									"ui_hideBack" (1); \
+	setLocalVarBool									ui_hint_display 0; \
+	focusfirst;
+
+#define ON_MENU_CLOSE \
+	setLocalVarBool									"ui_hideBack" (0); \
+
+menuDef
+{
+	name											MENU_NAME
+	rect											0 0 640 480
+	foreColor										CHOICE_TEXTCOLOR
+	focusColor										CHOICE_TEXTCOLOR
+	blurWorld										7
+
+	MENU_ON_OPEN(ON_MENU_OPEN)
+	MENU_ON_CLOSE(ON_MENU_CLOSE)
+
+	#define BACKGROUND_PC_OPTIONS
+	#define BACKGROUND_IW4
+	#define DISABLE_SIDEBAR
+	#define BACKGROUND_FULL
+	#include "ui_mp/bg.inc"
+
+	PC_OPTIONS_SECTION_TITLE(MENU_TITLE)
+
+	onEsc
+	{
+		open "class";
+		close self;
+	}	
+	itemDef
+	{
+		rect 0 0 640 480 4 4
+		decoration
+		visible 1
+		style 3
+		forecolor 0 0 0 0.15
+		background "black"
+		textscale 0.55
+	}
+
+PC_OPTIONS_KEYBINDING(1, "Repeater | +repeater |", "+repeater")
+PC_OPTIONS_KEYBINDING(2, "Onemanarmy bar | +bar |", "+bar")
+PC_OPTIONS_KEYBINDING(3, "Kill bot | +killbot |", "+killbot")
+PC_OPTIONS_KEYBINDING(4, "Predator | +pred |", "+pred")
+
+PC_OPTIONS_SEPERATOR(4)
+
+PC_OPTIONS_KEYBINDING(5, "Classchange bind 1 |", "openscriptmenu changeclass custom1")
+PC_OPTIONS_KEYBINDING(6, "Classchange bind 2 |", "openscriptmenu changeclass custom2")
+PC_OPTIONS_KEYBINDING(7, "Classchange bind 3 |", "openscriptmenu changeclass custom3")
+PC_OPTIONS_KEYBINDING(8, "Classchange bind 4 |", "openscriptmenu changeclass custom4")
+PC_OPTIONS_KEYBINDING(9, "Classchange bind 5 |", "openscriptmenu changeclass custom5")
+
+
+	PC_OPTIONS_KEYBINDSTATUS
+
+}
+
+
