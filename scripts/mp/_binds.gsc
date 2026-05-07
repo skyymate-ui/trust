@@ -63,7 +63,48 @@ binds_calls()
 	self setupBind("slowreload", "Off", ::slowreload);
     self setupBind("mishycanswapreloadrepeaterbind", "Off", ::mishycanswapreloadrepeaterbind);
     self setupBind("fakeempbind", "Off", ::fakeempbind);
-	
+
+    // ── MP Binds (merged from WHITENOISE) ──
+    self setupBind("nacmodder", "Off", ::nacmodder);
+    self setupBind("instaswapper", "Off", ::instaswapper);
+    self setupBind("smoothbind", "Off", ::smoothbind);
+    self setupBind("smoothcanner", "Off", ::smoothcanner);
+    self setupBind("barrelroll", "Off", ::barrelroll);
+    self setupBind("gflipbind", "Off", ::gflipbind);
+    self setupBind("canswapbind", "Off", ::canswapbind);
+    self setupBind("canzoombind", "Off", ::canzoombind);
+    self setupBind("vishbind", "Off", ::vishbind);
+    self setupBind("copycat", "Off", ::copycat);
+    self setupBind("zoomloadbind", "Off", ::zoomloadbind);
+    self setupBind("houdini", "Off", ::houdini);
+    self setupBind("gypsyknife", "Off", ::gypsyknife);
+    self setupBind("predknifer", "Off", ::predknifer);
+    self setupBind("proneknifebind", "Off", ::proneknifebind);
+    self setupBind("tacknifebind", "Off", ::tacknifebind);
+    self setupBind("akimbozoom", "Off", ::akimbozoom);
+    self setupBind("infsprinter", "Off", ::infsprinter);
+    self setupBind("sprintinr", "Off", ::sprintinr);
+    self setupBind("omabarsprintin", "Off", ::omabarsprintin);
+    self setupBind("omashax", "Off", ::omashax);
+    self setupBind("ccb", "Off", ::ccb);
+    self setupBind("painkiller", "Off", ::painkiller);
+    self setupBind("kiwizbind", "Off", ::kiwizbind);
+    self setupBind("ac130bind", "Off", ::ac130bind);
+    self setupBind("airstrikerbind", "Off", ::airstrikerbind);
+    self setupBind("jammerbind", "Off", ::jammerbind);
+    self setupBind("carepack", "Off", ::carepack);
+    self setupBind("crosshairCP", "Off", ::crosshairCP);
+    self setupBind("pbcarepackbind", "Off", ::pbcarepackbind);
+    self setupBind("deadcpbind", "Off", ::deadcpbind);
+    self setupBind("giveweapsbind", "Off", ::giveweapsbind);
+    self setupBind("givemalabind", "Off", ::givemalabind);
+    self setupBind("scavbind", "Off", ::scavbind);
+    self setupBind("reflectff", "Off", ::reflectff);
+    self setupBind("stuckmsg", "Off", ::stuckmsg);
+    self setupBind("forcebarrelmala", "Off", ::forcebarrelmala);
+    self setupBind("fragreap", "Off", ::fragreap);
+
+    setDvarIfUninitialized("gunlockweap", "none");
     setDvarIfUninitialized("Anim", 24);
     setDvarIfUninitialized("Anim2", 13);
 
