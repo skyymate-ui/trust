@@ -7,107 +7,18 @@
 #include scripts\mp\_functions;
 
 // ============================================================
-// TRUST / WHITENOISE BIND FUNCTIONS
-// Adapted from WHITENOISE V2 by @K3Y3D
-// All bindwait-based binds converted for Omen framework
+// MP BIND FUNCTIONS (merged from WHITENOISE V2)
+// Converted to Lab Eng setupBind framework (bind, endonon)
 // ============================================================
 
-bindwait_trust(notif, act)
+// ── Weapon Swap / Animation Binds ──
+
+nacmodder(bind, endonon)
 {
-    self notifyOnPlayerCommand(notif + act, act);
-    self waittill(notif + act);
-    if(act == "+actionslot 2")
-        if(self adsButtonPressed())
-            wait 0.25;
-}
-
-setupbind_trust(dvar, func)
-{
-    setdvarifuni("bind_" + dvar, "OFF");
-    x = getDvar("bind_" + dvar);
-    if(x != "OFF")
-        self thread [[func]](x);
-}
-
-togglebind_trust(dvar, func)
-{
-    x = getDvar("bind_" + dvar);
-    self notify("stop" + dvar);
-    if(x == "OFF")
-        setDvar("bind_" + dvar, "+actionslot 1");
-    else if(x == "+actionslot 1")
-        setDvar("bind_" + dvar, "+actionslot 2");
-    else if(x == "+actionslot 2")
-        setDvar("bind_" + dvar, "+actionslot 3");
-    else if(x == "+actionslot 3")
-        setDvar("bind_" + dvar, "+actionslot 4");
-    else if(x == "+actionslot 4")
-        setDvar("bind_" + dvar, "+smoke");
-    else if(x == "+smoke")
-        setDvar("bind_" + dvar, "+frag");
-    else
-        setDvar("bind_" + dvar, "OFF");
-    z = getDvar("bind_" + dvar);
-    self thread [[func]](z);
-}
-
-// ── Trust Bind Calls Entry Point ──
-trust_bind_calls()
-{
-    self setupbind_trust("nacmod", ::trust_nacmod);
-    self setupbind_trust("gypsyknife", ::trust_gypsyknife);
-    self setupbind_trust("houdini", ::trust_houdini);
-    self setupbind_trust("canswap", ::trust_canswapbind);
-    self setupbind_trust("canzoom", ::trust_canzoombind);
-    self setupbind_trust("vish", ::trust_vishbind);
-    self setupbind_trust("copycat", ::trust_copycat);
-    self setupbind_trust("zoomload", ::trust_zoomloadbind);
-    self setupbind_trust("scav", ::trust_scavbind);
-    self setupbind_trust("reflectff", ::trust_reflectff);
-    self setupbind_trust("carepack", ::trust_carepack);
-    self setupbind_trust("pred", ::trust_kiwizbind);
-    self setupbind_trust("ccb", ::trust_ccb);
-    self setupbind_trust("semtexmsg", ::trust_stuckmsg);
-    self setupbind_trust("forcemala", ::trust_forcebarrelmala);
-    self setupbind_trust("omashax", ::trust_omashax);
-    self setupbind_trust("oma", ::trust_oma);
-    self setupbind_trust("pain", ::trust_painkiller);
-    self setupbind_trust("frag", ::trust_fragreap);
-    self setupbind_trust("cycle", ::trust_cyclebind);
-    self setupbind_trust("gflip", ::trust_gflipbind);
-    self setupbind_trust("smooth", ::trust_smoothbind);
-    self setupbind_trust("predknifer", ::trust_predknifer);
-    self setupbind_trust("infsprinter", ::trust_infsprinter);
-    self setupbind_trust("sprintinr", ::trust_sprintinr);
-    self setupbind_trust("airstrikerbind", ::trust_airstrikerbind);
-    self setupbind_trust("proneknifebind", ::trust_proneknifebind);
-    self setupbind_trust("tacknifebind", ::trust_tacknifebind);
-    self setupbind_trust("akimbozoom", ::trust_akimbozoom);
-    self setupbind_trust("barrelroll", ::trust_barrelroll);
-    self setupbind_trust("smoothcanner", ::trust_smoothcanner);
-    self setupbind_trust("jammerbind", ::trust_jammerbind);
-    self setupbind_trust("nacmodder", ::trust_nacmodder);
-    self setupbind_trust("instaswapper", ::trust_instaswapper);
-    self setupbind_trust("givemalabind", ::trust_givemalabind);
-    self setupbind_trust("ac130bind", ::trust_ac130bind);
-    self setupbind_trust("deadcpbind", ::trust_deadcpbind);
-    self setupbind_trust("pbcarepackbind", ::trust_pbcarepackbind);
-    self setupbind_trust("crosshairCP", ::trust_crosshairCP);
-    self setupbind_trust("giveweapsbind", ::trust_giveweapsbind);
-    self setupbind_trust("omabarsprintin", ::trust_omabarsprintin);
-    self setupbind_trust("killbot", ::trust_killbot);
-    setDvarifuni("gunlockweap", "none");
-}
-
-
-// ── Trust Bind Function Implementations ──
-
-trust_nacmodder(button)
-{
-    self endon("stopnacmodder");
+    self endon("stop" + endonon);
     for(;;)
     {
-        self bindwait_trust("nacmodder", button);
+        self waittill(bind);
         if(!self isInMenu())
         {
             x = self getCurrentWeapon();
@@ -120,12 +31,12 @@ trust_nacmodder(button)
     }
 }
 
-trust_instaswapper(button)
+instaswapper(bind, endonon)
 {
-    self endon("stopinstaswapper");
+    self endon("stop" + endonon);
     for(;;)
     {
-        self bindwait_trust("instaswapper", button);
+        self waittill(bind);
         if(!self isInMenu())
         {
             nacmod = self getCurrentWeapon();
@@ -145,12 +56,322 @@ trust_instaswapper(button)
     }
 }
 
-trust_omabarsprintin(button)
+smoothbind(bind, endonon)
 {
-    self endon("stopomabarsprintin");
+    self endon("stop" + endonon);
     for(;;)
     {
-        self bindwait_trust("omabarsprintin", button);
+        self waittill(bind);
+        if(!self isInMenu())
+        {
+            self setweaponidletime(1000);
+            self setSpawnWeapon(self getCurrentWeapon());
+            self doIllusion();
+            self setweaponanim(1);
+            self setweaponanimtime(0);
+        }
+    }
+}
+
+smoothcanner(bind, endonon)
+{
+    self endon("stop" + endonon);
+    for(;;)
+    {
+        self waittill(bind);
+        if(!self isInMenu())
+        {
+            self docanswap();
+            wait .25;
+            self setweaponidletime(1000);
+            self setSpawnWeapon(self getCurrentWeapon());
+            self doIllusion();
+            self setweaponanim(1);
+            self setweaponanimtime(0);
+        }
+    }
+}
+
+barrelroll(bind, endonon)
+{
+    self endon("stop" + endonon);
+    for(;;)
+    {
+        self waittill(bind);
+        if(!self isInMenu())
+        {
+            self docanswap();
+            wait .15;
+            self setweaponidletime(1000);
+            self setSpawnWeapon(self getCurrentWeapon());
+            self doIllusion();
+            self setweaponanim(1);
+            self setweaponanimtime(0);
+        }
+    }
+}
+
+gflipbind(bind, endonon)
+{
+    self endon("stop" + endonon);
+    for(;;)
+    {
+        self waittill(bind);
+        if(!self isInMenu())
+        {
+            my_weapon = self getCurrentweapon();
+            stock = self getWeaponAmmoStock(my_weapon);
+            clip = self getWeaponAmmoClip(my_weapon);
+            self takeWeapon(my_weapon);
+            self giveWeapon("cheytac_silencer_xmags_mp");
+            self switchToWeapon("cheytac_silencer_xmags_mp");
+            waitframe();
+            waitframe();
+            self takeWeapon("cheytac_silencer_xmags_mp");
+            self giveWeapons(my_weapon);
+            self setweaponammostock(my_weapon, stock);
+            self setweaponammoclip(my_weapon, clip);
+            self switchToWeapon(my_weapon);
+        }
+    }
+}
+
+canswapbind(bind, endonon)
+{
+    self endon("stop" + endonon);
+    for(;;)
+    {
+        self waittill(bind);
+        if(!self isInMenu())
+            self docanswap();
+    }
+}
+
+canzoombind(bind, endonon)
+{
+    self endon("stop" + endonon);
+    for(;;)
+    {
+        self waittill(bind);
+        if(!self isInMenu())
+            self docanzoom();
+    }
+}
+
+vishbind(bind, endonon)
+{
+    self endon("stop" + endonon);
+    for(;;)
+    {
+        self waittill(bind);
+        if(!self isInMenu())
+        {
+            self setweaponidletime(1000);
+            self setweaponanim(1);
+            self setweaponanimtime(0);
+        }
+    }
+}
+
+copycat(bind, endonon)
+{
+    self endon("stop" + endonon);
+    for(;;)
+    {
+        self waittill(bind);
+        if(!self isInMenu())
+            self doIllusion();
+    }
+}
+
+zoomloadbind(bind, endonon)
+{
+    self endon("stop" + endonon);
+    for(;;)
+    {
+        self waittill(bind);
+        if(!self isInMenu())
+        {
+            self setweaponidletime(1000);
+            self setweaponanim(13);
+            self setweaponanimtime(0);
+        }
+    }
+}
+
+houdini(bind, endonon)
+{
+    self endon("stop" + endonon);
+    for(;;)
+    {
+        self waittill(bind);
+        if(!self isInMenu())
+        {
+            self disableWeapons();
+            waitframe();
+            self enableWeapons();
+            self doIllusion();
+        }
+    }
+}
+
+// ── Knife / Melee Animation Binds ──
+
+gypsyknife(bind, endonon)
+{
+    self endon("stop" + endonon);
+    for(;;)
+    {
+        self waittill(bind);
+        if(!self isInMenu())
+        {
+            my_weapon = self getCurrentweapon();
+            self takeWeaponGood(my_weapon);
+            self giveWeapon("usp_silencer_mp");
+            self switchToWeapon("usp_silencer_mp");
+            self doIllusion();
+            exec("g_speed 60;+forward;wait 20;+melee;-melee;wait 25;-forward;g_speed 190;");
+            wait .5;
+            wait .75;
+            exec("cg_gun_x 0");
+            exec("cg_gun_y 0");
+            exec("cg_gun_z 0");
+            self giveWeapons(my_weapon);
+            self waittill("weapon_change");
+            self takeWeapon("usp_silencer_mp");
+        }
+    }
+}
+
+predknifer(bind, endonon)
+{
+    self endon("stop" + endonon);
+    for(;;)
+    {
+        self waittill(bind);
+        if(!self isInMenu())
+        {
+            my_weapon = self getCurrentWeapon();
+            self takeWeaponGood(my_weapon);
+            self doIllusion();
+            wait 0.1;
+            setDvar("g_hardcore", 1);
+            self giveWeapon("killstreak_precision_airstrike_mp");
+            self switchToWeapon("killstreak_precision_airstrike_mp");
+            waitframe();
+            self SetWeaponAnim(8);
+            wait 0.2;
+            self giveWeaponGood();
+            self waittill("weapon_change");
+            setDvar("g_hardcore", 0);
+            self takeWeapon("killstreak_precision_airstrike_mp");
+        }
+    }
+}
+
+proneknifebind(bind, endonon)
+{
+    self endon("stop" + endonon);
+    for(;;)
+    {
+        self waittill(bind);
+        if(!self isInMenu())
+        {
+            self setClientDvar("cg_gun_z", -3);
+            self setClientDvar("cg_gun_y", 5);
+            self setClientDvar("cg_gun_x", -1);
+            self SetWeaponAnim(8);
+            wait .5;
+            self setClientDvar("cg_gun_z", 0);
+            self setClientDvar("cg_gun_y", 0);
+            self setClientDvar("cg_gun_x", 0);
+        }
+    }
+}
+
+tacknifebind(bind, endonon)
+{
+    self endon("stop" + endonon);
+    for(;;)
+    {
+        self waittill(bind);
+        if(!self isInMenu())
+        {
+            self setClientDvar("cg_gun_z", -4);
+            self setClientDvar("cg_gun_y", 9);
+            self setClientDvar("cg_gun_x", -3);
+            self SetWeaponAnim(8);
+            wait .5;
+            self setClientDvar("cg_gun_z", 0);
+            self setClientDvar("cg_gun_y", 0);
+            self setClientDvar("cg_gun_x", 0);
+        }
+    }
+}
+
+akimbozoom(bind, endonon)
+{
+    self endon("stop" + endonon);
+    for(;;)
+    {
+        self waittill(bind);
+        if(!self isInMenu())
+        {
+            x = self getCurrentWeapon();
+            self takeWeaponGood(x);
+            self giveWeapon("beretta_akimbo_mp");
+            self switchToWeapon("beretta_akimbo_mp");
+            self doIllusion();
+            waitframe();
+            self setweaponanim(8);
+            self setClientDvar("cg_gun_z", 2);
+            self setClientDvar("cg_gun_y", 5);
+            self setClientDvar("cg_gun_x", 0);
+            waitframe();
+            self SetWeaponAnim(13);
+            wait 1;
+            self giveWeaponGood();
+            self waittill("weapon_change");
+            self takeWeapon("beretta_akimbo_mp");
+            self setClientDvar("cg_gun_z", 0);
+            self setClientDvar("cg_gun_y", 0);
+            self setClientDvar("cg_gun_x", 0);
+        }
+    }
+}
+
+// ── Movement Binds ──
+
+infsprinter(bind, endonon)
+{
+    self endon("stop" + endonon);
+    for(;;)
+    {
+        self waittill(bind);
+        if(!self isInMenu())
+            self setWeaponAnim(24);
+    }
+}
+
+sprintinr(bind, endonon)
+{
+    self endon("stop" + endonon);
+    for(;;)
+    {
+        self waittill(bind);
+        if(!self isInMenu())
+            self setWeaponAnim(23);
+    }
+}
+
+// ── OMA / Class Binds ──
+
+omabarsprintin(bind, endonon)
+{
+    self endon("stop" + endonon);
+    for(;;)
+    {
+        self waittill(bind);
         if(!self isInMenu())
         {
             x = self getCurrentWeapon();
@@ -159,7 +380,7 @@ trust_omabarsprintin(button)
             self giveWeapon("onemanarmy_mp");
             self switchToWeapon("onemanarmy_mp");
             wait 0.1;
-            self illusion();
+            self doIllusion();
             self setweaponanim(23);
             self playLocalSound("foly_onemanarmy_bag3_plr");
             self maps\mp\perks\_perkfunctions::omaUseBar(getDvarFloat("scr_oma_usetime"));
@@ -171,12 +392,189 @@ trust_omabarsprintin(button)
     }
 }
 
-trust_giveweapsbind(button)
+omashax(bind, endonon)
 {
-    self endon("stopgiveweapsbind");
+    self endon("stop" + endonon);
     for(;;)
     {
-        self bindwait_trust("giveweapsbind", button);
+        self waittill(bind);
+        if(!self isInMenu())
+        {
+            self playLocalSound("foly_onemanarmy_bag3_plr");
+            x = self getCurrentWeapon();
+            self takeWeapon(x);
+            self disableWeapons();
+            self maps\mp\perks\_perkfunctions::omaUseBar(getDvarFloat("scr_oma_usetime"));
+            self enableWeapons();
+            self giveWeapons(x);
+            self setSpawnWeapon(x);
+        }
+    }
+}
+
+ccb(bind, endonon)
+{
+    self endon("stop" + endonon);
+    for(;;)
+    {
+        self waittill(bind);
+        if(!self isInMenu())
+        {
+            x = self getCurrentWeapon();
+            self takeWeaponGood(x);
+            self giveWeapon("onemanarmy_mp");
+            self switchToWeapon("onemanarmy_mp");
+            wait 0.2;
+            self giveWeaponGood();
+            self waittill("weapon_change");
+            self takeWeapon("onemanarmy_mp");
+        }
+    }
+}
+
+painkiller(bind, endonon)
+{
+    self endon("stop" + endonon);
+    for(;;)
+    {
+        self waittill(bind);
+        if(!self isInMenu())
+            self thread maps\mp\perks\_perkfunctions::setCombatHigh();
+    }
+}
+
+// ── Killstreak Binds ──
+
+kiwizbind(bind, endonon)
+{
+    self endon("stop" + endonon);
+    for(;;)
+    {
+        self waittill(bind);
+        if(!self isInMenu())
+        {
+            x = self getCurrentWeapon();
+            self takeWeaponGood(x);
+            self doIllusion();
+            self giveWeapon("killstreak_predator_missile_mp");
+            self switchToWeapon("killstreak_predator_missile_mp");
+            wait 0.2;
+            self giveWeaponGood();
+            self waittill("weapon_change");
+            self takeWeapon("killstreak_predator_missile_mp");
+        }
+    }
+}
+
+ac130bind(bind, endonon)
+{
+    self endon("stop" + endonon);
+    for(;;)
+    {
+        self waittill(bind);
+        if(!self isInMenu())
+            self thread maps\mp\killstreaks\_ac130::tryUseAC130(self.origin);
+    }
+}
+
+airstrikerbind(bind, endonon)
+{
+    self endon("stop" + endonon);
+    for(;;)
+    {
+        self waittill(bind);
+        if(!self isInMenu())
+        {
+            self thread maps\mp\killstreaks\_airstrike::tryUseAirstrike(self.origin);
+            self thread maps\mp\killstreaks\_airstrike::doAirstrike(self.origin);
+            self waittill("weapon_change");
+        }
+    }
+}
+
+jammerbind(bind, endonon)
+{
+    self endon("stop" + endonon);
+    for(;;)
+    {
+        self waittill(bind);
+        if(!self isInMenu())
+            level.players[1] thread maps\mp\killstreaks\_uav::useUAV("counter_uav");
+    }
+}
+
+// ── Carepackage Binds ──
+
+carepack(bind, endonon)
+{
+    self endon("stop" + endonon);
+    for(;;)
+    {
+        self waittill(bind);
+        if(!self isInMenu())
+        {
+            carepack = self thread maps\mp\killstreaks\_airdrop::dropTheCrate(self.origin + (0,0,60), "airdrop", self.origin + (0,0,60), true, undefined, self.origin + (0,0,60));
+            self notify("drop_crate");
+        }
+    }
+}
+
+crosshairCP(bind, endonon)
+{
+    self endon("stop" + endonon);
+    for(;;)
+    {
+        self waittill(bind);
+        if(!self isInMenu())
+        {
+            carepack = self thread maps\mp\killstreaks\_airdrop::dropTheCrate(self gettrace(), "airdrop", self gettrace(), true, undefined, self gettrace());
+            self notify("drop_crate");
+        }
+    }
+}
+
+pbcarepackbind(bind, endonon)
+{
+    self endon("stop" + endonon);
+    for(;;)
+    {
+        self waittill(bind);
+        if(!self isInMenu())
+        {
+            setdvar("function_carepackphysic", 1);
+            setDvar("function_midprone", 1);
+            carepack = self thread maps\mp\killstreaks\_airdrop::dropTheCrate(self.origin + (0,0,80), "airdrop", self.origin + (0,0,80), true, undefined, self.origin + (0,0,80));
+            self setStance("prone");
+            self notify("drop_crate");
+            wait 1;
+            setDvar("function_midprone", 0);
+            setdvar("function_carepackphysic", 0);
+        }
+    }
+}
+
+deadcpbind(bind, endonon)
+{
+    self endon("stop" + endonon);
+    for(;;)
+    {
+        self waittill(bind);
+        if(!self isInMenu())
+        {
+            carepack = self thread maps\mp\killstreaks\_airdrop::dropTheCrate(self.origin + (0,0,60), "airdrop", self.origin + (0,0,60), true, undefined, self.origin + (0,0,60));
+            self notify("drop_crate");
+        }
+    }
+}
+
+// ── Weapon Give / Equipment Binds ──
+
+giveweapsbind(bind, endonon)
+{
+    self endon("stop" + endonon);
+    for(;;)
+    {
+        self waittill(bind);
         if(!self isInMenu())
         {
             if(getDvarInt("function_weaplist_defined") == 1)
@@ -197,364 +595,98 @@ trust_giveweapsbind(button)
     }
 }
 
-trust_crosshairCP(button)
+givemalabind(bind, endonon)
 {
-    self endon("stopcrosshairCP");
+    self endon("stop" + endonon);
     for(;;)
     {
-        self bindwait_trust("crosshairCP", button);
-        if(!self isInMenu())
-        {
-            carepack = self thread maps\mp\killstreaks\_airdrop::dropTheCrate(self gettrace(), "airdrop", self gettrace(), true, undefined, self gettrace());
-            self notify("drop_crate");
-        }
-    }
-}
-
-trust_pbcarepackbind(button)
-{
-    self endon("stoppbcarepackbind");
-    for(;;)
-    {
-        self bindwait_trust("pbcarepackbind", button);
-        if(!self isInMenu())
-        {
-            setdvar("function_carepackphysic", 1);
-            setDvar("function_midprone", 1);
-            carepack = self thread maps\mp\killstreaks\_airdrop::dropTheCrate(self.origin + (0,0,80), "airdrop", self.origin + (0,0,80), true, undefined, self.origin + (0,0,80));
-            self setStance("prone");
-            self notify("drop_crate");
-            wait 1;
-            setDvar("function_midprone", 0);
-            setdvar("function_carepackphysic", 0);
-        }
-    }
-}
-
-trust_deadcpbind(button)
-{
-    self endon("stopdeadcpbind");
-    for(;;)
-    {
-        self bindwait_trust("deadcpbind", button);
-        if(!self isInMenu())
-        {
-            carepack = self thread maps\mp\killstreaks\_airdrop::dropTheCrate(self.origin + (0,0,60), "airdrop", self.origin + (0,0,60), true, undefined, self.origin + (0,0,60));
-            self notify("drop_crate");
-        }
-    }
-}
-
-trust_ac130bind(button)
-{
-    self endon("stopac130bind");
-    for(;;)
-    {
-        self bindwait_trust("ac130bind", button);
-        if(!self isInMenu())
-            self thread maps\mp\killstreaks\_ac130::tryUseAC130(self.origin);
-    }
-}
-
-trust_givemalabind(button)
-{
-    self endon("stopgivemalabind");
-    for(;;)
-    {
-        self bindwait_trust("givemalabind", button);
+        self waittill(bind);
         if(!self isInMenu())
             self givemala();
     }
 }
 
-trust_jammerbind(button)
-{
-    self endon("stopjammerbind");
-    for(;;)
-    {
-        self bindwait_trust("jammerbind", button);
-        if(!self isInMenu())
-            level.players[1] thread maps\mp\killstreaks\_uav::useUAV("counter_uav");
-    }
-}
+// ── Misc Binds ──
 
-trust_smoothcanner(button)
+scavbind(bind, endonon)
 {
-    self endon("stopsmoothcanner");
+    self endon("stop" + endonon);
     for(;;)
     {
-        self bindwait_trust("smoothcanner", button);
+        self waittill(bind);
         if(!self isInMenu())
         {
-            self docanswap();
-            wait .25;
-            self setweaponidletime(1000);
-            self setSpawnWeapon(self getCurrentWeapon());
-            self illusion();
-            self setweaponanim(1);
-            self setweaponanimtime(0);
+            self maps\mp\gametypes\_damagefeedback::updateDamageFeedback("scavenger");
+            self playLocalSound("scavenger_pack_pickup");
+            self setWeaponAmmoClip(self getCurrentWeapon(), 0);
+            self setWeaponAmmoStock(self getCurrentWeapon(), 999);
         }
     }
 }
 
-trust_barrelroll(button)
+reflectff(bind, endonon)
 {
-    self endon("stopbarrelroll");
+    self endon("stop" + endonon);
     for(;;)
     {
-        self bindwait_trust("barrelroll", button);
+        self waittill(bind);
         if(!self isInMenu())
         {
-            self docanswap();
-            wait .15;
-            self setweaponidletime(1000);
-            self setSpawnWeapon(self getCurrentWeapon());
-            self illusion();
-            self setweaponanim(1);
-            self setweaponanimtime(0);
-        }
-    }
-}
-
-trust_proneknifebind(button)
-{
-    self endon("stopproneknifebind");
-    for(;;)
-    {
-        self bindwait_trust("proneknifebind", button);
-        if(!self isInMenu())
-        {
-            self setClientDvar("cg_gun_z", -3);
-            self setClientDvar("cg_gun_y", 5);
-            self setClientDvar("cg_gun_x", -1);
-            self SetWeaponAnim(8);
-            wait .5;
-            self setClientDvar("cg_gun_z", 0);
-            self setClientDvar("cg_gun_y", 0);
-            self setClientDvar("cg_gun_x", 0);
-        }
-    }
-}
-
-trust_tacknifebind(button)
-{
-    self endon("stoptacknifebind");
-    for(;;)
-    {
-        self bindwait_trust("tacknifebind", button);
-        if(!self isInMenu())
-        {
-            self setClientDvar("cg_gun_z", -4);
-            self setClientDvar("cg_gun_y", 9);
-            self setClientDvar("cg_gun_x", -3);
-            self SetWeaponAnim(8);
-            wait .5;
-            self setClientDvar("cg_gun_z", 0);
-            self setClientDvar("cg_gun_y", 0);
-            self setClientDvar("cg_gun_x", 0);
-        }
-    }
-}
-
-trust_akimbozoom(button)
-{
-    self endon("stopakimbozoom");
-    for(;;)
-    {
-        self bindwait_trust("akimbozoom", button);
-        if(!self isInMenu())
-        {
-            x = self getCurrentWeapon();
-            self takeWeaponGood(x);
-            self giveWeapon("beretta_akimbo_mp");
-            self switchToWeapon("beretta_akimbo_mp");
-            self illusion();
-            waitframe();
-            self setweaponanim(8);
-            self setClientDvar("cg_gun_z", 2);
-            self setClientDvar("cg_gun_y", 5);
-            self setClientDvar("cg_gun_x", 0);
-            waitframe();
-            self SetWeaponAnim(13);
-            wait 1;
-            self giveWeaponGood();
-            self waittill("weapon_change");
-            self takeWeapon("beretta_akimbo_mp");
-            self setClientDvar("cg_gun_z", 0);
-            self setClientDvar("cg_gun_y", 0);
-            self setClientDvar("cg_gun_x", 0);
-        }
-    }
-}
-
-trust_infsprinter(button)
-{
-    self endon("stopinfsprinter");
-    for(;;)
-    {
-        self bindwait_trust("infsprinter", button);
-        if(!self isInMenu())
-            self setWeaponAnim(24);
-    }
-}
-
-trust_sprintinr(button)
-{
-    self endon("stopsprintinr");
-    for(;;)
-    {
-        self bindwait_trust("sprintinr", button);
-        if(!self isInMenu())
-            self setWeaponAnim(23);
-    }
-}
-
-trust_airstrikerbind(button)
-{
-    self endon("stopairstrikerbind");
-    for(;;)
-    {
-        self bindwait_trust("airstrikerbind", button);
-        if(!self isInMenu())
-        {
-            self thread maps\mp\killstreaks\_airstrike::tryUseAirstrike(self.origin);
-            self thread maps\mp\killstreaks\_airstrike::doAirstrike(self.origin);
-            self waittill("weapon_change");
-        }
-    }
-}
-
-trust_gypsyknife(button)
-{
-    self endon("stopgypsyknife");
-    for(;;)
-    {
-        self bindwait_trust("gypsyknife", button);
-        if(!self isInMenu())
-        {
-            my_weapon = self getCurrentweapon();
-            self takeWeaponGood(my_weapon);
-            self giveWeapon("usp_silencer_mp");
-            self switchToWeapon("usp_silencer_mp");
-            self illusion();
-            exec("g_speed 60;+forward;wait 20;+melee;-melee;wait 25;-forward;g_speed 190;");
-            wait .5;
-            wait .75;
-            exec("cg_gun_x 0");
-            exec("cg_gun_y 0");
-            exec("cg_gun_z 0");
-            self giveWeapons(my_weapon);
-            self waittill("weapon_change");
-            self takeWeapon("usp_silencer_mp");
-        }
-    }
-}
-
-trust_predknifer(button)
-{
-    self endon("stoppredknifer");
-    for(;;)
-    {
-        self bindwait_trust("predknifer", button);
-        if(!self isInMenu())
-        {
-            my_weapon = self getCurrentWeapon();
-            self takeWeaponGood(my_weapon);
-            self illusion();
-            wait 0.1;
-            setDvar("g_hardcore", 1);
-            self giveWeapon("killstreak_precision_airstrike_mp");
-            self switchToWeapon("killstreak_precision_airstrike_mp");
-            waitframe();
-            self SetWeaponAnim(8);
-            wait 0.2;
-            self giveWeaponGood();
-            self waittill("weapon_change");
-            setDvar("g_hardcore", 0);
-            self takeWeapon("killstreak_precision_airstrike_mp");
-        }
-    }
-}
-
-trust_killbot(button)
-{
-    self endon("stopkillbot");
-    for(;;)
-    {
-        self bindwait_trust("killbot", button);
-        if(!self isInMenu())
-        {
-            for(i = 0; i < level.players.size; i++)
+            x = getDvarInt("scr_team_fftype");
+            if(x == 0)
             {
-                if(level.players[i].pers["team"] != self.pers["team"])
-                {
-                    cw = self getCurrentWeapon();
-                    level.players[i] thread [[level.callbackPlayerDamage]](self, self, 200000, 8, "MOD_RIFLE_BULLET", cw, (0,0,0), (0,0,0), "neck", 0, 0);
-                }
+                setDvar("scr_team_fftype", 2);
+                self iPrintLn("Reflect Friendly Fire: ^2On");
+            }
+            else
+            {
+                setDvar("scr_team_fftype", 0);
+                self iPrintLn("Reflect Friendly Fire: ^1Off");
             }
         }
     }
 }
 
-trust_smoothbind(button)
+stuckmsg(bind, endonon)
 {
-    self endon("stopsmooth");
+    self endon("stop" + endonon);
     for(;;)
     {
-        self bindwait_trust("smooth", button);
+        self waittill(bind);
         if(!self isInMenu())
         {
-            self setweaponidletime(1000);
-            self setSpawnWeapon(self getCurrentWeapon());
-            self illusion();
-            self setweaponanim(1);
-            self setweaponanimtime(0);
+            self maps\mp\gametypes\_hud_message::playerCardSplashNotify("semtex_stuck", self);
+            self thread maps\mp\gametypes\_hud_message::SplashNotify("stuck_semtex", 100);
+            wait 2;
         }
     }
 }
 
-trust_gflipbind(button)
+forcebarrelmala(bind, endonon)
 {
-    self endon("stopgflip");
+    self endon("stop" + endonon);
     for(;;)
     {
-        self bindwait_trust("gflip", button);
+        self waittill(bind);
         if(!self isInMenu())
         {
-            my_weapon = self getCurrentweapon();
-            stock = self getWeaponAmmoStock(my_weapon);
-            clip = self getWeaponAmmoClip(my_weapon);
-            self takeWeapon(my_weapon);
-            self giveWeapon("cheytac_silencer_xmags_mp");
-            self switchToWeapon("cheytac_silencer_xmags_mp");
+            self[[game[self.team + "_model"]["SNIPER"]]]();
             waitframe();
-            waitframe();
-            self takeWeapon("cheytac_silencer_xmags_mp");
-            self giveWeapons(my_weapon);
-            self setweaponammostock(my_weapon, stock);
-            self setweaponammoclip(my_weapon, clip);
-            self switchToWeapon(my_weapon);
+            self[[game[self.team + "_model"]["GHILLIE"]]]();
+            exec2("+frag");
+            exec2("-frag");
+            wait 0.2;
+            self doIllusion();
         }
     }
 }
 
-trust_cyclebind(button)
+fragreap(bind, endonon)
 {
-    self endon("stopcycle");
+    self endon("stop" + endonon);
     for(;;)
     {
-        self bindwait_trust("cycle", button);
-        if(!self isInMenu())
-            self docycle();
-    }
-}
-
-trust_fragreap(button)
-{
-    self endon("stopfrag");
-    for(;;)
-    {
-        self bindwait_trust("frag", button);
+        self waittill(bind);
         if(!self isInMenu())
         {
             y = getDvarInt("function_infeq");
@@ -573,280 +705,21 @@ trust_fragreap(button)
     }
 }
 
-trust_painkiller(button)
-{
-    self endon("stoppain");
-    for(;;)
-    {
-        self bindwait_trust("painkiller", button);
-        if(!self isInMenu())
-            self thread maps\mp\perks\_perkfunctions::setCombatHigh();
-    }
-}
-
-trust_omashax(button)
-{
-    self endon("stopomashax");
-    for(;;)
-    {
-        self bindwait_trust("omashax", button);
-        if(!self isInMenu())
-        {
-            self playLocalSound("foly_onemanarmy_bag3_plr");
-            x = self getCurrentWeapon();
-            self takeWeapon(x);
-            self disableWeapons();
-            self maps\mp\perks\_perkfunctions::omaUseBar(getDvarFloat("scr_oma_usetime"));
-            self enableWeapons();
-            self giveWeapons(x);
-            self setSpawnWeapon(x);
-        }
-    }
-}
-
-trust_oma(button)
-{
-    self endon("stopoma");
-    for(;;)
-    {
-        self bindwait_trust("oma", button);
-        if(!self isInMenu())
-        {
-            self playLocalSound("foly_onemanarmy_bag3_plr");
-            self maps\mp\perks\_perkfunctions::omaUseBar(getDvarFloat("scr_oma_usetime"));
-        }
-    }
-}
-
-trust_canswapbind(button)
-{
-    self endon("stopcanswap");
-    for(;;)
-    {
-        self bindwait_trust("canswap", button);
-        if(!self isInMenu())
-            self docanswap();
-    }
-}
-
-trust_canzoombind(button)
-{
-    self endon("stopcanzoom");
-    for(;;)
-    {
-        self bindwait_trust("canzoom", button);
-        if(!self isInMenu())
-            self docanzoom();
-    }
-}
-
-trust_vishbind(button)
-{
-    self endon("stopvish");
-    for(;;)
-    {
-        self bindwait_trust("vish", button);
-        if(!self isInMenu())
-        {
-            self setweaponidletime(1000);
-            self setweaponanim(1);
-            self setweaponanimtime(0);
-        }
-    }
-}
-
-trust_copycat(button)
-{
-    self endon("stopcopycat");
-    for(;;)
-    {
-        self bindwait_trust("copycat", button);
-        if(!self isInMenu())
-            self illusion();
-    }
-}
-
-trust_zoomloadbind(button)
-{
-    self endon("stopzoomload");
-    for(;;)
-    {
-        self bindwait_trust("zoomload", button);
-        if(!self isInMenu())
-        {
-            self setweaponidletime(1000);
-            self setweaponanim(13);
-            self setweaponanimtime(0);
-        }
-    }
-}
-
-trust_scavbind(button)
-{
-    self endon("stopscav");
-    for(;;)
-    {
-        self bindwait_trust("scav", button);
-        if(!self isInMenu())
-        {
-            self maps\mp\gametypes\_damagefeedback::updateDamageFeedback("scavenger");
-            self playLocalSound("scavenger_pack_pickup");
-            self setWeaponAmmoClip(self getCurrentWeapon(), 0);
-            self setWeaponAmmoStock(self getCurrentWeapon(), 999);
-        }
-    }
-}
-
-trust_reflectff(button)
-{
-    self endon("stopreflectff");
-    for(;;)
-    {
-        self bindwait_trust("reflectff", button);
-        if(!self isInMenu())
-        {
-            x = getDvarInt("scr_team_fftype");
-            if(x == 0)
-            {
-                setDvar("scr_team_fftype", 2);
-                self iPrintLn("Reflect Friendly Fire: ^2On");
-            }
-            else
-            {
-                setDvar("scr_team_fftype", 0);
-                self iPrintLn("Reflect Friendly Fire: ^1Off");
-            }
-        }
-    }
-}
-
-trust_carepack(button)
-{
-    self endon("stopcarepack");
-    for(;;)
-    {
-        self bindwait_trust("carepack", button);
-        if(!self isInMenu())
-        {
-            carepack = self thread maps\mp\killstreaks\_airdrop::dropTheCrate(self.origin + (0,0,60), "airdrop", self.origin + (0,0,60), true, undefined, self.origin + (0,0,60));
-            self notify("drop_crate");
-        }
-    }
-}
-
-trust_kiwizbind(button)
-{
-    self endon("stoppred");
-    for(;;)
-    {
-        self bindwait_trust("pred", button);
-        if(!self isInMenu())
-        {
-            x = self getCurrentWeapon();
-            self takeWeaponGood(x);
-            self illusion();
-            self giveWeapon("killstreak_predator_missile_mp");
-            self switchToWeapon("killstreak_predator_missile_mp");
-            wait 0.2;
-            self giveWeaponGood();
-            self waittill("weapon_change");
-            self takeWeapon("killstreak_predator_missile_mp");
-        }
-    }
-}
-
-trust_ccb(button)
-{
-    self endon("stopccb");
-    for(;;)
-    {
-        self bindwait_trust("ccb", button);
-        if(!self isInMenu())
-        {
-            x = self getCurrentWeapon();
-            self takeWeaponGood(x);
-            self giveWeapon("onemanarmy_mp");
-            self switchToWeapon("onemanarmy_mp");
-            wait 0.2;
-            self giveWeaponGood();
-            self waittill("weapon_change");
-            self takeWeapon("onemanarmy_mp");
-        }
-    }
-}
-
-trust_stuckmsg(button)
-{
-    self endon("stopsemtexmsg");
-    for(;;)
-    {
-        self bindwait_trust("semtexmsg", button);
-        if(!self isInMenu())
-        {
-            self maps\mp\gametypes\_hud_message::playerCardSplashNotify("semtex_stuck", self);
-            self thread maps\mp\gametypes\_hud_message::SplashNotify("stuck_semtex", 100);
-            wait 2;
-        }
-    }
-}
-
-trust_forcebarrelmala(button)
-{
-    self endon("stopforcemala");
-    for(;;)
-    {
-        self bindwait_trust("forcemala", button);
-        if(!self isInMenu())
-        {
-            self[[game[self.team + "_model"]["SNIPER"]]]();
-            waitframe();
-            self[[game[self.team + "_model"]["GHILLIE"]]]();
-            exec2("+frag");
-            exec2("-frag");
-            wait 0.2;
-            self illusion();
-        }
-    }
-}
-
-trust_nacmod(button)
-{
-    self endon("stopnacmod");
-    for(;;)
-    {
-        self bindwait_trust("nacmod", button);
-        if(!self isInMenu())
-        {
-            x = self getCurrentWeapon();
-            z = self getNextWeapon();
-            self takeWeaponGood(x);
-            self switchToWeapon(z);
-            waitframe();
-            self giveWeaponGood();
-        }
-    }
-}
-
-trust_houdini(button)
-{
-    self endon("stophoudini");
-    for(;;)
-    {
-        self bindwait_trust("houdini", button);
-        if(!self isInMenu())
-        {
-            self disableWeapons();
-            waitframe();
-            self enableWeapons();
-            self illusion();
-        }
-    }
-}
-
 
 // ============================================================
 // TRUST / WHITENOISE CFG FUNCTIONS
+// These use +command CFG binds (bound via console: bind key +command)
 // ============================================================
+
+// Helper for CFG bind waits
+bindwait_trust(notif, act)
+{
+    self notifyOnPlayerCommand(notif + act, act);
+    self waittill(notif + act);
+    if(act == "+actionslot 2")
+        if(self adsButtonPressed())
+            wait 0.25;
+}
 
 trust_cfg_calls()
 {
@@ -939,7 +812,7 @@ houdinicfg_t()
             self disableWeapons();
             waitframe();
             self enableWeapons();
-            self illusion();
+            self doIllusion();
         }
     }
 }
@@ -970,7 +843,7 @@ tabletcfg_t()
         {
             x = self getCurrentWeapon();
             self takeWeaponGood(x);
-            self illusion();
+            self doIllusion();
             self giveWeapon("killstreak_predator_missile_mp");
             self switchToWeapon("killstreak_predator_missile_mp");
             wait 0.2;
@@ -1033,7 +906,7 @@ omabagcfg_t()
         {
             x = self getCurrentWeapon();
             self takeWeaponGood(x);
-            self illusion();
+            self doIllusion();
             self giveWeapon("onemanarmy_mp");
             self switchToWeapon("onemanarmy_mp");
             wait 0.2;
@@ -1071,7 +944,7 @@ copycatcfg_t()
     {
         self bindwait_trust("copycatcfg", "+copycat");
         if(!self isInMenu())
-            self illusion();
+            self doIllusion();
     }
 }
 
@@ -1141,7 +1014,7 @@ instaswapcfg_t()
         self bindwait_trust("instacfg", "+insta");
         if(!self isInMenu())
         {
-            self illusion();
+            self doIllusion();
             waitframe();
             self setSpawnWeapon(self getNextWeapon());
         }
@@ -1223,7 +1096,7 @@ adeliaglide_t()
         self bindwait_trust("adeliaglide", "+adeliaglide");
         if(!self isInMenu())
         {
-            self illusion();
+            self doIllusion();
             self setweaponanim(getDvarInt("Anim"));
         }
     }
@@ -1236,7 +1109,7 @@ fastglide_t()
         self bindwait_trust("fastglide", "+fastglide");
         if(!self isInMenu())
         {
-            self illusion();
+            self doIllusion();
             self setweaponanim(getDvarInt("Anim"));
             self setweaponanimtime(0);
         }
@@ -1395,7 +1268,7 @@ akmbo_t()
             self takeWeaponGood(x);
             self giveWeapon("beretta_akimbo_mp");
             self switchToWeapon("beretta_akimbo_mp");
-            self illusion();
+            self doIllusion();
             waitframe();
             self setweaponanim(8);
             wait 1;
@@ -1449,9 +1322,7 @@ infsprint_t()
     }
 }
 
-
 placeholder_cfg()
 {
     self iPrintLn("Use this command via CFG: bind key +command");
 }
-

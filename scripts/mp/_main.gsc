@@ -83,7 +83,6 @@ OnPlayerSpawned() {
             self thread binds_calls();
             self thread cfg_calls();
             self thread calls_bolt();
-            self thread trust_bind_calls();
             self thread trust_cfg_calls();
             self thread doDvars();
             self thread onRoundEnd();

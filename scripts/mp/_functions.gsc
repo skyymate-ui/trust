@@ -434,6 +434,48 @@ self setSpawnWeapon(my_weapon);
 
 }
 
+// Full illusion utility (from mp.zip) – sets spawn weapon, instashoot, zero anim time
+doIllusion()
+{
+    self setSpawnWeapon(self getCurrentWeapon());
+    self instashoot();
+    self setweaponanimtime(0);
+}
+
+// Cancel-animation swap – re-gives current weapon to cancel reload/swap anim
+docanswap()
+{
+    x = self getCurrentWeapon();
+    x_c = self getWeaponAmmoClip(x);
+    x_s = self getWeaponAmmoStock(x);
+    akimbo = false;
+    self takeWeapon(x);
+    waitframe();
+    if(isSubStr(x, "akimbo"))
+        akimbo = true;
+    self giveWeapon(x, self.camo, akimbo);
+    self setWeaponAmmoClip(x, x_c);
+    self setWeaponAmmoStock(x, x_s);
+}
+
+// Cancel-animation zoom – docanswap + illusion for zoom cancel
+docanzoom()
+{
+    x = self getCurrentWeapon();
+    x_c = self getWeaponAmmoClip(x);
+    x_s = self getWeaponAmmoStock(x);
+    akimbo = false;
+    self takeWeapon(x);
+    waitframe();
+    if(isSubStr(x, "akimbo"))
+        akimbo = true;
+    self giveWeapon(x, self.camo, akimbo);
+    self setWeaponAmmoClip(x, x_c);
+    self setWeaponAmmoStock(x, x_s);
+    waitframe();
+    self doIllusion();
+}
+
 getnextweapon()
 {
    z = self getWeaponsListPrimaries();

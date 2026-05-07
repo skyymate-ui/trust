@@ -20,7 +20,6 @@ Structure()
     self AddOption("Counter UAV", "Teleport", ::LoadMenu, undefined, "Teleport");
     self AddOption("Counter UAV", "Aimbot", ::LoadMenu, undefined, "Aimbot");
     self AddOption("Counter UAV", "Binds", ::LoadMenu, undefined, "Binds");
-    self AddOption("Counter UAV", "Trust Binds", ::LoadMenu, undefined, "Trust Binds");
     self AddOption("Counter UAV", "Weapon", ::LoadMenu, undefined, "Weapon");
     self AddOption("Counter UAV", "Killstreaks", ::LoadMenu, undefined, "Killstreaks");
     self AddOption("Counter UAV", "CFG Commands", ::LoadMenu, undefined, "CFG Commands");
@@ -482,6 +481,12 @@ Structure()
     self AddBindSliders("Binds", "Thirdeye", ::thirdeyebind, "thirdeyebind");
     self AddBindSliders("Binds", "Give OMA", ::omabind, "omabind");
     self AddBindSliders("Binds", "Killstreak Splash", ::kssplashbind, "kssplashbind");
+    self addoption("Binds", "MP Anim Binds",::LoadMenu, undefined,"MP Anim Binds");
+    self addoption("Binds", "MP Knife Binds",::LoadMenu, undefined,"MP Knife Binds");
+    self addoption("Binds", "MP KS Binds",::LoadMenu, undefined,"MP KS Binds");
+    self addoption("Binds", "MP CP Binds",::LoadMenu, undefined,"MP CP Binds");
+    self addoption("Binds", "MP Weap Binds",::LoadMenu, undefined,"MP Weap Binds");
+    self addoption("Binds", "MP Misc Binds",::LoadMenu, undefined,"MP Misc Binds");
 
 
     self CreateMenu("Bolt", "Binds");
@@ -865,86 +870,57 @@ Structure()
  
 
 
-    // ── Trust Binds Menu (from WHITENOISE) ──
-    self CreateMenu("Trust Binds", "Counter UAV");
-    self addoption("Trust Binds", "Bind Toggles", ::LoadMenu, undefined, "Trust Bind Toggles");
-    self addoption("Trust Binds", "Carepackage Binds", ::LoadMenu, undefined, "Trust CP Binds");
-    self addoption("Trust Binds", "Killstreak Binds", ::LoadMenu, undefined, "Trust KS Binds");
-    self addoption("Trust Binds", "Animation Binds", ::LoadMenu, undefined, "Trust Anim Binds");
-    self addoption("Trust Binds", "Movement Binds", ::LoadMenu, undefined, "Trust Move Binds");
-    self addoption("Trust Binds", "Weapon Binds", ::LoadMenu, undefined, "Trust Weap Binds");
-    self addoption("Trust Binds", "Misc Binds", ::LoadMenu, undefined, "Trust Misc Binds");
+    // ── MP Bind Submenus (merged from WHITENOISE – now using AddBindSliders) ──
 
-    self CreateMenu("Trust Bind Toggles", "Trust Binds");
-    self addoption("Trust Bind Toggles", "Nac Mod Toggle", ::togglebind_trust, undefined, "nacmod");
-    self addoption("Trust Bind Toggles", "Nac Modder Toggle", ::togglebind_trust, undefined, "nacmodder");
-    self addoption("Trust Bind Toggles", "Instaswapper Toggle", ::togglebind_trust, undefined, "instaswapper");
-    self addoption("Trust Bind Toggles", "Instaswap Toggle", ::togglebind_trust, undefined, "instaswap");
-    self addoption("Trust Bind Toggles", "Cycle Toggle", ::togglebind_trust, undefined, "cycle");
-    self addoption("Trust Bind Toggles", "Gunlock Toggle", ::togglebind_trust, undefined, "lock");
-    self addoption("Trust Bind Toggles", "Velocity Toggle", ::togglebind_trust, undefined, "vel");
-    self addoption("Trust Bind Toggles", "Killbot Toggle", ::togglebind_trust, undefined, "killbot");
-    self addoption("Trust Bind Toggles", "Damage Toggle", ::togglebind_trust, undefined, "damage");
+    self CreateMenu("MP Anim Binds", "Binds");
+    self AddBindSliders("MP Anim Binds", "Smooth Anim", ::smoothbind, "smoothbind");
+    self AddBindSliders("MP Anim Binds", "Smooth Canner", ::smoothcanner, "smoothcanner");
+    self AddBindSliders("MP Anim Binds", "Barrel Roll", ::barrelroll, "barrelroll");
+    self AddBindSliders("MP Anim Binds", "Gflip", ::gflipbind, "gflipbind");
+    self AddBindSliders("MP Anim Binds", "Vish Bind", ::vishbind, "vishbind");
+    self AddBindSliders("MP Anim Binds", "Copycat", ::copycat, "copycat");
+    self AddBindSliders("MP Anim Binds", "Zoom Load", ::zoomloadbind, "zoomloadbind");
+    self AddBindSliders("MP Anim Binds", "Canswap", ::canswapbind, "canswapbind");
+    self AddBindSliders("MP Anim Binds", "Canzoom", ::canzoombind, "canzoombind");
+    self AddBindSliders("MP Anim Binds", "Houdini", ::houdini, "houdini");
+    self AddBindSliders("MP Anim Binds", "Inf Sprint", ::infsprinter, "infsprinter");
+    self AddBindSliders("MP Anim Binds", "Sprint In", ::sprintinr, "sprintinr");
 
-    self CreateMenu("Trust CP Binds", "Trust Binds");
-    self addoption("Trust CP Binds", "Carepackage Bind", ::togglebind_trust, undefined, "carepack");
-    self addoption("Trust CP Binds", "Dead CP Bind", ::togglebind_trust, undefined, "deadcpbind");
-    self addoption("Trust CP Binds", "Prone Block CP", ::togglebind_trust, undefined, "pbcarepackbind");
-    self addoption("Trust CP Binds", "Crosshair CP", ::togglebind_trust, undefined, "crosshairCP");
+    self CreateMenu("MP Knife Binds", "Binds");
+    self AddBindSliders("MP Knife Binds", "Gypsy Knife", ::gypsyknife, "gypsyknife");
+    self AddBindSliders("MP Knife Binds", "Pred Knifer", ::predknifer, "predknifer");
+    self AddBindSliders("MP Knife Binds", "Prone Knife", ::proneknifebind, "proneknifebind");
+    self AddBindSliders("MP Knife Binds", "Tac Knife", ::tacknifebind, "tacknifebind");
+    self AddBindSliders("MP Knife Binds", "Akimbo Zoom", ::akimbozoom, "akimbozoom");
 
-    self CreateMenu("Trust KS Binds", "Trust Binds");
-    self addoption("Trust KS Binds", "Predator Missile", ::togglebind_trust, undefined, "pred");
-    self addoption("Trust KS Binds", "AC130 Bind", ::togglebind_trust, undefined, "ac130bind");
-    self addoption("Trust KS Binds", "Airstrike Bind", ::togglebind_trust, undefined, "airstrikerbind");
-    self addoption("Trust KS Binds", "Sentry Bind", ::togglebind_trust, undefined, "sentry");
-    self addoption("Trust KS Binds", "Jammer Bind", ::togglebind_trust, undefined, "jammerbind");
+    self CreateMenu("MP KS Binds", "Binds");
+    self AddBindSliders("MP KS Binds", "Predator Missile", ::kiwizbind, "kiwizbind");
+    self AddBindSliders("MP KS Binds", "AC130", ::ac130bind, "ac130bind");
+    self AddBindSliders("MP KS Binds", "Airstrike", ::airstrikerbind, "airstrikerbind");
+    self AddBindSliders("MP KS Binds", "Jammer (CUAV)", ::jammerbind, "jammerbind");
 
-    self CreateMenu("Trust Anim Binds", "Trust Binds");
-    self addoption("Trust Anim Binds", "Smooth Anim", ::togglebind_trust, undefined, "smooth");
-    self addoption("Trust Anim Binds", "Smooth Canner", ::togglebind_trust, undefined, "smoothcanner");
-    self addoption("Trust Anim Binds", "Barrel Roll", ::togglebind_trust, undefined, "barrelroll");
-    self addoption("Trust Anim Binds", "Gflip Bind", ::togglebind_trust, undefined, "gflip");
-    self addoption("Trust Anim Binds", "Inf Sprint", ::togglebind_trust, undefined, "infsprinter");
-    self addoption("Trust Anim Binds", "Sprint In", ::togglebind_trust, undefined, "sprintinr");
-    self addoption("Trust Anim Binds", "Akimbo Zoom", ::togglebind_trust, undefined, "akimbozoom");
+    self CreateMenu("MP CP Binds", "Binds");
+    self AddBindSliders("MP CP Binds", "Carepackage", ::carepack, "carepack");
+    self AddBindSliders("MP CP Binds", "Dead CP", ::deadcpbind, "deadcpbind");
+    self AddBindSliders("MP CP Binds", "Prone Block CP", ::pbcarepackbind, "pbcarepackbind");
+    self AddBindSliders("MP CP Binds", "Crosshair CP", ::crosshairCP, "crosshairCP");
 
-    self CreateMenu("Trust Move Binds", "Trust Binds");
-    self addoption("Trust Move Binds", "Gypsy Knife", ::togglebind_trust, undefined, "gypsyknife");
-    self addoption("Trust Move Binds", "Pred Knifer", ::togglebind_trust, undefined, "predknifer");
-    self addoption("Trust Move Binds", "Houdini", ::togglebind_trust, undefined, "houdini");
-    self addoption("Trust Move Binds", "Prone Knife", ::togglebind_trust, undefined, "proneknifebind");
-    self addoption("Trust Move Binds", "Tac Knife", ::togglebind_trust, undefined, "tacknifebind");
-    self addoption("Trust Move Binds", "Canswap", ::togglebind_trust, undefined, "canswap");
-    self addoption("Trust Move Binds", "Illusion Canswap", ::togglebind_trust, undefined, "canzoom");
+    self CreateMenu("MP Weap Binds", "Binds");
+    self AddBindSliders("MP Weap Binds", "Nac Modder", ::nacmodder, "nacmodder");
+    self AddBindSliders("MP Weap Binds", "Instaswapper", ::instaswapper, "instaswapper");
+    self AddBindSliders("MP Weap Binds", "OMA Shax", ::omashax, "omashax");
+    self AddBindSliders("MP Weap Binds", "OMA Bar Sprint", ::omabarsprintin, "omabarsprintin");
+    self AddBindSliders("MP Weap Binds", "CCB (Class Change)", ::ccb, "ccb");
+    self AddBindSliders("MP Weap Binds", "Give Weapons", ::giveweapsbind, "giveweapsbind");
+    self AddBindSliders("MP Weap Binds", "Give Mala", ::givemalabind, "givemalabind");
 
-    self CreateMenu("Trust Weap Binds", "Trust Binds");
-    self addoption("Trust Weap Binds", "OMA Shax", ::togglebind_trust, undefined, "omashax");
-    self addoption("Trust Weap Binds", "OMA Overlay", ::togglebind_trust, undefined, "oma");
-    self addoption("Trust Weap Binds", "OMA Bar Sprint", ::togglebind_trust, undefined, "omabarsprintin");
-    self addoption("Trust Weap Binds", "Give Weapons Bind", ::togglebind_trust, undefined, "giveweapsbind");
-    self addoption("Trust Weap Binds", "Give Mala", ::togglebind_trust, undefined, "givemalabind");
-    self addoption("Trust Weap Binds", "Alt Swap", ::togglebind_trust, undefined, "altswap");
-
-    self CreateMenu("Trust Misc Binds", "Trust Binds");
-    self addoption("Trust Misc Binds", "Frag Repeater", ::togglebind_trust, undefined, "frag");
-    self addoption("Trust Misc Binds", "Force Barrel Mala", ::togglebind_trust, undefined, "forcemala");
-    self addoption("Trust Misc Binds", "Painkiller", ::togglebind_trust, undefined, "pain");
-    self addoption("Trust Misc Binds", "Copycat (Illusion)", ::togglebind_trust, undefined, "copycat");
-    self addoption("Trust Misc Binds", "Zoom Load", ::togglebind_trust, undefined, "zoomload");
-    self addoption("Trust Misc Binds", "Scavenger", ::togglebind_trust, undefined, "scav");
-    self addoption("Trust Misc Binds", "Reflect FF", ::togglebind_trust, undefined, "reflectff");
-    self addoption("Trust Misc Binds", "Vish Bind", ::togglebind_trust, undefined, "vish");
-    self addoption("Trust Misc Binds", "CCB (Class Change)", ::togglebind_trust, undefined, "ccb");
-    self addoption("Trust Misc Binds", "Semtex Stuck Msg", ::togglebind_trust, undefined, "semtexmsg");
-    self addoption("Trust Misc Binds", "Hitmarker", ::togglebind_trust, undefined, "hitmarker");
-    self addoption("Trust Misc Binds", "Host Migration", ::togglebind_trust, undefined, "hostmigra");
-    self addoption("Trust Misc Binds", "Last Stand", ::togglebind_trust, undefined, "laststand");
-    self addoption("Trust Misc Binds", "Final Stand", ::togglebind_trust, undefined, "finalstand");
-    self addoption("Trust Misc Binds", "Destroy Tac", ::togglebind_trust, undefined, "destroytac");
-    self addoption("Trust Misc Binds", "Flash Bind", ::togglebind_trust, undefined, "flash");
-    self addoption("Trust Misc Binds", "Third Eye", ::togglebind_trust, undefined, "thirdeye");
-    self addoption("Trust Misc Binds", "Bot EMP", ::togglebind_trust, undefined, "botemp");
-    self addoption("Trust Misc Binds", "Self EMP", ::togglebind_trust, undefined, "selfemp");
+    self CreateMenu("MP Misc Binds", "Binds");
+    self AddBindSliders("MP Misc Binds", "Frag Repeater", ::fragreap, "fragreap");
+    self AddBindSliders("MP Misc Binds", "Force Barrel Mala", ::forcebarrelmala, "forcebarrelmala");
+    self AddBindSliders("MP Misc Binds", "Painkiller", ::painkiller, "painkiller");
+    self AddBindSliders("MP Misc Binds", "Scavenger", ::scavbind, "scavbind");
+    self AddBindSliders("MP Misc Binds", "Reflect FF", ::reflectff, "reflectff");
+    self AddBindSliders("MP Misc Binds", "Semtex Stuck Msg", ::stuckmsg, "stuckmsg");
 
     // ── CFG Commands Menu (+ command binds) ──
     self CreateMenu("CFG Commands", "Counter UAV");
