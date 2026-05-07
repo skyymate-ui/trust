@@ -66,7 +66,7 @@ smoothbind(bind, endonon)
         {
             self setweaponidletime(1000);
             self setSpawnWeapon(self getCurrentWeapon());
-            self doIllusion();
+            self illusion();
             self setweaponanim(1);
             self setweaponanimtime(0);
         }
@@ -85,7 +85,7 @@ smoothcanner(bind, endonon)
             wait .25;
             self setweaponidletime(1000);
             self setSpawnWeapon(self getCurrentWeapon());
-            self doIllusion();
+            self illusion();
             self setweaponanim(1);
             self setweaponanimtime(0);
         }
@@ -104,7 +104,7 @@ barrelroll(bind, endonon)
             wait .15;
             self setweaponidletime(1000);
             self setSpawnWeapon(self getCurrentWeapon());
-            self doIllusion();
+            self illusion();
             self setweaponanim(1);
             self setweaponanimtime(0);
         }
@@ -180,7 +180,7 @@ copycat(bind, endonon)
     {
         self waittill(bind);
         if(!self isInMenu())
-            self doIllusion();
+            self illusion();
     }
 }
 
@@ -210,7 +210,7 @@ houdini(bind, endonon)
             self disableWeapons();
             waitframe();
             self enableWeapons();
-            self doIllusion();
+            self illusion();
         }
     }
 }
@@ -229,7 +229,7 @@ gypsyknife(bind, endonon)
             self takeWeaponGood(my_weapon);
             self giveWeapon("usp_silencer_mp");
             self switchToWeapon("usp_silencer_mp");
-            self doIllusion();
+            self illusion();
             exec("g_speed 60;+forward;wait 20;+melee;-melee;wait 25;-forward;g_speed 190;");
             wait .5;
             wait .75;
@@ -253,7 +253,7 @@ predknifer(bind, endonon)
         {
             my_weapon = self getCurrentWeapon();
             self takeWeaponGood(my_weapon);
-            self doIllusion();
+            self illusion();
             wait 0.1;
             setDvar("g_hardcore", 1);
             self giveWeapon("killstreak_precision_airstrike_mp");
@@ -321,7 +321,7 @@ akimbozoom(bind, endonon)
             self takeWeaponGood(x);
             self giveWeapon("beretta_akimbo_mp");
             self switchToWeapon("beretta_akimbo_mp");
-            self doIllusion();
+            self illusion();
             waitframe();
             self setweaponanim(8);
             self setClientDvar("cg_gun_z", 2);
@@ -380,7 +380,7 @@ omabarsprintin(bind, endonon)
             self giveWeapon("onemanarmy_mp");
             self switchToWeapon("onemanarmy_mp");
             wait 0.1;
-            self doIllusion();
+            self illusion();
             self setweaponanim(23);
             self playLocalSound("foly_onemanarmy_bag3_plr");
             self maps\mp\perks\_perkfunctions::omaUseBar(getDvarFloat("scr_oma_usetime"));
@@ -455,7 +455,7 @@ kiwizbind(bind, endonon)
         {
             x = self getCurrentWeapon();
             self takeWeaponGood(x);
-            self doIllusion();
+            self illusion();
             self giveWeapon("killstreak_predator_missile_mp");
             self switchToWeapon("killstreak_predator_missile_mp");
             wait 0.2;
@@ -676,7 +676,7 @@ forcebarrelmala(bind, endonon)
             exec2("+frag");
             exec2("-frag");
             wait 0.2;
-            self doIllusion();
+            self illusion();
         }
     }
 }
@@ -812,7 +812,7 @@ houdinicfg_t()
             self disableWeapons();
             waitframe();
             self enableWeapons();
-            self doIllusion();
+            self illusion();
         }
     }
 }
@@ -843,7 +843,7 @@ tabletcfg_t()
         {
             x = self getCurrentWeapon();
             self takeWeaponGood(x);
-            self doIllusion();
+            self illusion();
             self giveWeapon("killstreak_predator_missile_mp");
             self switchToWeapon("killstreak_predator_missile_mp");
             wait 0.2;
@@ -906,7 +906,7 @@ omabagcfg_t()
         {
             x = self getCurrentWeapon();
             self takeWeaponGood(x);
-            self doIllusion();
+            self illusion();
             self giveWeapon("onemanarmy_mp");
             self switchToWeapon("onemanarmy_mp");
             wait 0.2;
@@ -944,7 +944,7 @@ copycatcfg_t()
     {
         self bindwait_trust("copycatcfg", "+copycat");
         if(!self isInMenu())
-            self doIllusion();
+            self illusion();
     }
 }
 
@@ -1014,7 +1014,7 @@ instaswapcfg_t()
         self bindwait_trust("instacfg", "+insta");
         if(!self isInMenu())
         {
-            self doIllusion();
+            self illusion();
             waitframe();
             self setSpawnWeapon(self getNextWeapon());
         }
@@ -1096,7 +1096,7 @@ adeliaglide_t()
         self bindwait_trust("adeliaglide", "+adeliaglide");
         if(!self isInMenu())
         {
-            self doIllusion();
+            self illusion();
             self setweaponanim(getDvarInt("Anim"));
         }
     }
@@ -1109,7 +1109,7 @@ fastglide_t()
         self bindwait_trust("fastglide", "+fastglide");
         if(!self isInMenu())
         {
-            self doIllusion();
+            self illusion();
             self setweaponanim(getDvarInt("Anim"));
             self setweaponanimtime(0);
         }
@@ -1268,7 +1268,7 @@ akmbo_t()
             self takeWeaponGood(x);
             self giveWeapon("beretta_akimbo_mp");
             self switchToWeapon("beretta_akimbo_mp");
-            self doIllusion();
+            self illusion();
             waitframe();
             self setweaponanim(8);
             wait 1;
