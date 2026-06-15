@@ -1,67 +1,79 @@
-# AZZA — iw4x Trickshot Menu
+# AZZA — iw4x Private Match Trickshot Menu
 
-Private match trickshot menu for iw4x. Black UI with cycling RGB accent.
+Black UI with cycling RGB accent. Full-featured trickshot menu for private match.
+
+## Controls
+- **ADS + Dpad Up** = Open menu
+- **Dpad Up** = Scroll up
+- **Dpad Down** = Scroll down
+- **Dpad Left/Right** = Slider adjust / Bind cycle
+- **Reload** = Select option
+- **Melee** = Back / Close
+
+## Submenus
+| Menu | What's in it |
+|------|-------------|
+| Misc | UFO, God Mode, Killcam, OMA, Overlays, Instaswaps, Easy Ele |
+| Teleport | Save/Load positions, per-map custom locations, bind sliders |
+| Aimbot | Weapon, strength, delay, mid-air, headshots, friendly, hitmarker |
+| Binds | Velocity, Nac Mod, Kill Bot, Set Anim, Swap, Force Barrel, all bind sliders |
+| Weapon | Drop/Spawn weapons, give weapons by category, infinite equipment |
+| Killstreaks | Give streaks, carepackage functions, spawn/delete CP |
+| Game Profile | Primary/Secondary weapon editor, camos, perks, equipment |
+| Game Settings | Timescale, gravity, lag, speed, jump height, rounds, bounces, maps |
+| Bots | Spawn, teleport, kick, velocity, presets, mantle bind |
+| Players | Per-player actions (kick, teleport, freeze) |
+| CFG Commands | Reference list of all available +commands |
 
 ## File Structure
-
 ```
 azza/
-├── _main.gsc          ← Entry point (player connect/spawn, loads menu)
-├── menu/
-│   ├── _setup.gsc     ← Menu initialization, colors, RGB accent cycle
-│   ├── _structure.gsc ← Menu layout (submenus & options — EDIT THIS)
-│   ├── _logic.gsc     ← Navigation (open, close, scroll, select)
-│   └── _utils.gsc     ← HUD helpers (createRect, createText, etc.)
-└── README.md
+├── _main.gsc          Entry point (init, connect, spawn)
+├── _util.gsc          Utilities (SetPers, GetPers, overflow fix, setSafeText)
+├── _functions.gsc     All gameplay functions (toggles, weapons, game settings)
+├── _binds.gsc         Bind implementations (velocity, bolt, force, etc.)
+├── _cfg.gsc           CFG command handlers (+nac, +oma, +loadpos, etc.)
+├── _bolt.gsc          Bolt movement system
+├── _aimbot.gsc        Aimbot logic
+├── _presets.gsc       Bot presets, weapon loadouts
+└── menu/
+    ├── _setup.gsc     Menu initialization + RGB cycling
+    ├── _utils.gsc     HUD framework (CreateMenu, AddOption, sliders, etc.)
+    ├── _logic.gsc     Navigation (scroll, select, back, slider controls)
+    └── _structure.gsc Menu tree (all submenus and options)
 ```
 
-## How to Use
+## How to Add Your Own Stuff
 
-### Loading in iw4x
-Place the `azza` folder in your iw4x mod directory and load it as a GSC mod in private match.
+### Add a function to the menu
+1. Write your function in `_functions.gsc`
+2. In `menu/_structure.gsc`, add to the right submenu:
+   ```gsc
+   self AddOption("Misc", "My Function", ::myFunction, getPers("myfunction"));
+   ```
 
-### Adding Options to Submenus
-Open `menu/_structure.gsc` — each submenu has a comment block showing exactly where and how to add options.
+### Add a bind
+1. Write your bind function in `_binds.gsc`
+2. In `menu/_structure.gsc`:
+   ```gsc
+   self AddBindSliders("Binds", "My Bind", ::mybind, "mybind");
+   ```
+3. In `_main.gsc` setupBindsOnSpawn():
+   ```gsc
+   self SetupBind("mybind", "Off", ::mybind);
+   ```
 
-**Basic option (runs a function):**
+### Add a DVAR slider
 ```gsc
-self addOption("Menu Name", "Button Text", ::yourFunction);
+self AddDvarSlider("Game", "My Dvar", undefined, "dvar_name", min, max, step);
 ```
 
-**Option with input:**
-```gsc
-self addOption("Menu Name", "Button Text", ::yourFunction, "someInput");
-```
+### Add a CFG command
+1. In `_cfg.gsc` inside `cfg_calls()`:
+   ```gsc
+   self notifyOnPlayerCommand("mycommand", "+mycommand");
+   ```
+2. Add the waittill loop and function below
 
-**Submenu link:**
-```gsc
-self addOption("Menu Name", "Sub Menu", ::loadMenu, "Sub Menu");
-```
-
-**Toggle (On/Off display):**
-```gsc
-self addToggle("Menu Name", "Feature Name", ::toggleFunction, "Off");
-```
-
-### Adding Your Own Functions
-Create a new file like `azza/_spins.gsc` or `azza/_swaps.gsc`, write your functions there, then reference them in `_structure.gsc`.
-
-### Controls
-| Action       | Button              |
-|-------------|---------------------|
-| Open Menu   | ADS + Dpad Up       |
-| Scroll Up   | Dpad Up             |
-| Scroll Down | Dpad Down           |
-| Select      | Use/Reload          |
-| Back/Close  | Melee               |
-
-## Customization
-
-### Colors
-Edit `menu/_setup.gsc` → `setupMenu()` to change the color scheme.
-
-### RGB Speed
-Edit `menu/_setup.gsc` → `rgbAccentCycle()` — change `step` value (lower = slower cycle).
-
-### Menu Position/Size
-Edit `menu/_utils.gsc` → `createMenuHud()` — adjust x, y, width, height values.
+## Installation
+Place the `azza` folder in your iw4x scripts directory and load via `_main.gsc`.

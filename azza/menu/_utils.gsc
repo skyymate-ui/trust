@@ -1,172 +1,212 @@
 // ============================================================
 // AZZA MENU — HUD Utilities
-// Helper functions for creating/destroying menu HUD elements
+// Full menu framework: options, sliders, dvars, arrays, binds
 // ============================================================
 
 #include common_scripts\utility;
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;
+#include azza\_util;
 
-// ============================================================
-// MENU CREATION HELPERS
-// These are used by _structure.gsc and _logic.gsc
-// ============================================================
+IsInMenu() {
+    return self.menu.isopen;
+}
 
-createMenu(menu, parent)
-{
+CreateMenu(menu, parent) {
     self.menu.text[menu] = [];
     self.menu.bool[menu] = [];
-    self.menu.func[menu] = [];
-    self.menu.input[menu] = [];
     self.menu.parent[menu] = parent;
 }
 
-addOption(menu, text, func, input)
-{
+AddOption(menu, text, func, bool, input, input2) {
     index = self.menu.text[menu].size;
-    self.menu.text[menu][index] = text;
-
-    if(isDefined(func))
+    if(isdefined(func))
         self.menu.func[menu][index] = func;
     else
-        self.menu.func[menu][index] = ::placeholder;
-
-    if(isDefined(input))
-        self.menu.input[menu][index] = input;
-
-    // Submenu indicator
-    if(isDefined(func) && func == ::loadMenu)
-        self.menu.bool[menu][index] = ">";
+        self.menu.func[menu][index] = ::PlaceHolder;
+    if(isdefined(bool))
+        self.menu.bool[menu][index] = "[" + bool + "]";
     else
         self.menu.bool[menu][index] = "";
+    if(isdefined(func) && func == ::LoadMenu)
+        self.menu.bool[menu][index] = ">";
+    self.menu.text[menu][index] = text;
+    self.menu.input[menu][index] = input;
+    self.menu.input2[menu][index] = input2;
+    self.menu.slidertype[menu][index] = "none";
 }
 
-addToggle(menu, text, func, state)
-{
+AddSlider(menu, text, func, pers, min, max, amount) {
     index = self.menu.text[menu].size;
-    self.menu.text[menu][index] = text;
-
-    if(isDefined(func))
+    if(isdefined(func))
         self.menu.func[menu][index] = func;
     else
-        self.menu.func[menu][index] = ::placeholder;
+        self.menu.func[menu][index] = ::Placeholder;
+    self.menu.text[menu][index] = text;
+    self.menu.bool[menu][index] = "[" + self GetPers(pers) + "]";
+    self.menu.pers[menu][index] = pers;
+    self.menu.min[menu][index] = min;
+    self.menu.max[menu][index] = max;
+    self.menu.amount[menu][index] = amount;
+    self.menu.slidertype[menu][index] = "slider";
+}
 
-    if(isDefined(state))
-        self.menu.bool[menu][index] = "[" + state + "]";
+AddDvarSlider(menu, text, func, dvar, min, max, amount, player) {
+    index = self.menu.text[menu].size;
+    if (isdefined(func)) {
+        self.menu.func[menu][index] = func;
+    } else {
+        self.menu.func[menu][index] = ::Placeholder;
+    }
+    if (isdefined(player)) {
+        self.menu.bool[menu][index] = "[" + player.name + "]";
+    } else {
+        self.menu.bool[menu][index] = "[" + GetDvarFloat(dvar) + "]";
+    }
+    self.menu.text[menu][index] = text;
+    self.menu.dvar[menu][index] = dvar;
+    self.menu.min[menu][index] = min;
+    self.menu.max[menu][index] = max;
+    self.menu.amount[menu][index] = amount;
+    self.menu.slidertype[menu][index] = "dvar";
+}
+
+AddArraySlider(menu, text, func, array, arrayname, input) {
+    index = self.menu.text[menu].size;
+    if(!isdefined(level.arrayscrolls))
+        level.arrayscrolls = [];
+    level.arrayscrolls[arrayname] = array;
+    self.menu.array[menu][index] = array;
+    self.menu.arrayname[menu][index] = arrayname;
+    if(!isdefined(self GetPers("arrayindex_" + arrayname)))
+        self SetPers("arrayindex_" + arrayname, 0);
+    self.menu.bool[menu][index] = "[" + level.arrayscrolls[arrayname][Int(self GetPers("arrayindex_" + arrayname))] + "]";
+    if(isdefined(func))
+        self.menu.func[menu][index] = func;
+    else
+        self.menu.func[menu][index] = ::Placeholder;
+    self.menu.text[menu][index] = text;
+    self.menu.input[menu][index] = input;
+    self.menu.slidertype[menu][index] = "array";
+}
+
+AddBindSliders(menu, text, func, pers) {
+    index = self.menu.text[menu].size;
+    if(isdefined(func))
+        self.menu.func[menu][index] = func;
+    else
+        self.menu.func[menu][index] = ::Placeholder;
+    self.menu.text[menu][index] = text;
+    if(self GetPers(pers) != "[Off]" && self GetPers(pers) != "Off")
+        self.menu.bool[menu][index] = "[[{" + self GetPers(pers) + "}]]";
     else
         self.menu.bool[menu][index] = "[Off]";
+    self.menu.pers[menu][index] = pers;
+    self.menu.slidertype[menu][index] = "bind";
 }
 
-placeholder()
-{
-    // Empty function — used as default for unimplemented options
+PlaceHolder() {
 }
 
-loadMenu(menu)
-{
-    self azza\menu\_structure::structure();
+Placeholder() {
+}
+
+ExecuteFunction(f, i1, i2) {
+    if(isdefined(i2))
+        return self thread [[f]](i1, i2);
+    else if(isdefined(i1))
+        return self thread [[f]](i1);
+    return self thread [[f]]();
+}
+
+LoadMenu(menu) {
+    self azza\menu\_structure::Structure();
     self.menu.smoothscroll = false;
-
-    // Save scroll position of current menu
     self.menu.lastscroll[self.menu.current] = self.menu.scroll;
-
-    if(self.menu.isopen)
-        self destroyMenu();
-
+    if(self IsInMenu())
+        self DestroyMenuHud();
     self.menu.current = menu;
-
-    // Restore scroll position if returning to this menu
-    if(!isDefined(self.menu.lastscroll[self.menu.current]))
+    if(!isdefined(self.menu.lastscroll[self.menu.current]))
         self.menu.scroll = 0;
     else
         self.menu.scroll = self.menu.lastscroll[self.menu.current];
-
-    self createMenuHud();
-    self thread azza\menu\_logic::updateScroll();
+    self CreateMenuHud();
+    self azza\menu\_logic::UpdateScroll();
+    self UpdateMenuBackground();
     self.menu.smoothscroll = true;
 }
 
 // ============================================================
-// HUD RENDERING
+// HUD RENDERING — Black + RGB Accent
 // ============================================================
 
-createMenuHud()
-{
+DestroyMenuHud() {
+    self notify("endCordsUpdate");
+    foreach(key, element in self.hud) {
+        if(key != "text" && key != "bool_text") {
+            element Destroy();
+        }
+        else {
+            foreach(text_element in self.hud[key]) {
+                text_element Destroy();
+            }
+        }
+    }
+}
+
+CreateMenuHud() {
     self.hud = [];
 
-    // --- Background Panel ---
-    self.hud["background"] = self createRect("CENTER", "CENTER", 0, 0, 200, 300, self.menu.color["background"], 0, 0.85);
+    // --- Background (pure black) ---
+    self.hud["background"] = self CreateRectangle("white", "TOP", "CENTER", 280, -150, 180, 200, self.menu.color["background"], 0, 0.85);
 
-    // --- Header ---
-    self.hud["header"] = self createRect("CENTER", "CENTER", 0, -135, 200, 25, self.menu.color["header"], 1, 0.95);
+    // --- Header box (slightly lighter) ---
+    self.hud["header_box"] = self CreateRectangle("white", "TOP", "CENTER", 280, -150, 180, 17, self.menu.color["header"], 1, 0.95);
 
-    // --- Header Accent Line (RGB) ---
-    self.hud["accent_top"] = self createRect("CENTER", "CENTER", 0, -122, 200, 2, self.menu.color["accent"], 2, 1);
+    // --- RGB accent line top ---
+    self.hud["accent_top"] = self CreateRectangle("white", "TOP", "CENTER", 280, -133, 180, 2, self.menu.color["accent"], 2, 1);
 
-    // --- Title Text ---
-    self.hud["title"] = self createText(self.menutitle, "objective", 1.4, "CENTER", "CENTER", 0, -135, 3, (1, 1, 1));
+    // --- Title ---
+    self.hud["title"] = CreateText("objective", 1.3, "TOP", "CENTER", 280, -150, (1, 1, 1), 3, 1, self.menutitle);
 
     // --- Scrollbar (RGB accent) ---
-    self.hud["scrollbar"] = self createRect("CENTER", "CENTER", -95, -100, 3, 18, self.menu.color["accent"], 2, 1);
+    self.hud["scroll"] = self CreateRectangle("white", "TOP", "CENTER", 192, -128, 3, 13, self.menu.color["accent"], 2, 1);
 
-    // --- Bottom Accent Line (RGB) ---
-    self.hud["accent_bot"] = self createRect("CENTER", "CENTER", 0, 150, 200, 2, self.menu.color["accent"], 2, 1);
+    // --- RGB accent line bottom ---
+    self.hud["accent_bot"] = self CreateRectangle("white", "TOP", "CENTER", 280, 52, 180, 2, self.menu.color["accent"], 2, 1);
 
-    // --- Option Text Elements ---
-    self.hud["options"] = [];
-    self.hud["values"] = [];
-    for(i = 0; i < self.menu.maxsize; i++)
-    {
-        self.hud["options"][i] = self createText("", "objective", 1.1, "LEFT", "CENTER", -85, -105 + (i * 22), 3, self.menu.color["text"]);
-        self.hud["values"][i] = self createText("", "objective", 1.1, "RIGHT", "CENTER", 90, -105 + (i * 22), 3, self.menu.color["text"]);
+    // --- Text elements ---
+    self.hud["text"] = [];
+    self.hud["bool_text"] = [];
+    for(i = 0; i < self.menu.maxsize; i++) {
+        self.hud["text"][i] = CreateText("objective", 1.1, "TOP", "CENTER", 220, -128 + (i * 15), (1, 1, 1), 3, 1, "");
+        self.hud["bool_text"][i] = CreateText("objective", 1.1, "TOP", "CENTER", 340, -128 + (i * 15), (0.7, 0.7, 0.7), 3, 1, "");
     }
 
-    // Start RGB update on accent elements
-    self thread updateAccentHud();
+    // Start RGB accent update
+    self thread updateAccentElements();
 }
 
-destroyMenu()
-{
-    self notify("stopAccentUpdate");
-
-    if(!isDefined(self.hud))
-        return;
-
-    keys = getArrayKeys(self.hud);
-    for(i = 0; i < keys.size; i++)
-    {
-        if(keys[i] == "options" || keys[i] == "values")
-        {
-            for(j = 0; j < self.hud[keys[i]].size; j++)
-                self.hud[keys[i]][j] destroy();
-        }
-        else
-        {
-            self.hud[keys[i]] destroy();
-        }
-    }
-    self.hud = undefined;
+UpdateMenuBackground() {
+    totalItems = self.menu.text[self.menu.current].size;
+    if(totalItems > self.menu.maxsize)
+        totalItems = self.menu.maxsize;
+    height = 20 + (totalItems * 15);
+    self.hud["background"] setShader("white", 180, height);
 }
 
-// ============================================================
-// RGB ACCENT HUD UPDATE
-// Updates accent-colored HUD elements each frame to match
-// the cycling RGB color
-// ============================================================
-updateAccentHud()
-{
+updateAccentElements() {
     self endon("disconnect");
     self endon("death");
-    self endon("stopAccentUpdate");
+    self endon("endCordsUpdate");
 
-    while(true)
-    {
+    while(true) {
         if(isDefined(self.hud["accent_top"]))
             self.hud["accent_top"].color = self.menu.color["accent"];
         if(isDefined(self.hud["accent_bot"]))
             self.hud["accent_bot"].color = self.menu.color["accent"];
-        if(isDefined(self.hud["scrollbar"]))
-            self.hud["scrollbar"].color = self.menu.color["accent"];
+        if(isDefined(self.hud["scroll"]))
+            self.hud["scroll"].color = self.menu.color["accent"];
         wait 0.05;
     }
 }
@@ -175,31 +215,40 @@ updateAccentHud()
 // LOW-LEVEL HUD PRIMITIVES
 // ============================================================
 
-createRect(align, relative, x, y, width, height, color, sort, alpha)
-{
-    elem = newClientHudElem(self);
-    elem.elemType = "bar";
-    elem.width = width;
-    elem.height = height;
-    elem.align = align;
-    elem.relative = relative;
-    elem.xOffset = 0;
-    elem.children = [];
-    elem.sort = sort;
-    elem.color = color;
-    elem.alpha = alpha;
-    elem setPoint(align, relative, x, y);
-    elem setShader("white", width, height);
-    return elem;
+CreateRectangle(shader, align, relative, x, y, width, height, color, sort, alpha) {
+    barElem = NewClientHudElem(self);
+    barElem.elemType = "icon";
+    barElem.width = width;
+    barElem.height = height;
+    barElem.align = align;
+    barElem.relative = relative;
+    barElem.xOffset = 0;
+    barElem.children = [];
+    barElem.color = color;
+    barElem.alpha = alpha;
+    barElem SetShader(shader, width, height);
+    barElem.sort = sort;
+    barElem SetPoint(align, relative, x, y);
+    barElem.foreground = true;
+    barElem.archived = false;
+    return barElem;
 }
 
-createText(text, font, fontScale, align, relative, x, y, sort, color)
-{
-    elem = self createFontString(font, fontScale);
-    elem setPoint(align, relative, x, y);
-    elem.sort = sort;
-    elem.alpha = 1;
-    elem.color = color;
-    elem setText(text);
-    return elem;
+CreateText(font, fontscale, align, relative, x, y, color, sort, alpha, text) {
+    textElem = CreateServerFontString(font, fontscale);
+    textElem SetPoint(align, relative, x, y);
+    textElem.sort = sort;
+    textElem.type = "text";
+    textElem SetSafeText(text);
+    textElem.color = color;
+    textElem.alpha = alpha;
+    textElem.hideWhenInMenu = true;
+    textElem.foreground = true;
+    textElem.archived = true;
+    return textElem;
+}
+
+elemFadeOverTime(time, alpha) {
+    self fadeOverTime(time);
+    self.alpha = alpha;
 }

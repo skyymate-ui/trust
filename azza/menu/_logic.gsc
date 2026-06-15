@@ -1,181 +1,424 @@
 // ============================================================
-// AZZA MENU — Navigation Logic
-// Handles opening, closing, scrolling, and selecting options
+// AZZA MENU — Full Navigation Logic
+// Open, scroll, sliders, dvars, arrays, binds, use, close
 // ============================================================
 
 #include common_scripts\utility;
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;
+#include azza\_util;
 #include azza\menu\_utils;
+#include azza\menu\_structure;
 
-// ============================================================
-// MENU BUTTON LISTENERS
-// ============================================================
+freezeMenuControls(state) {
+    if (state) {
+        self notify("disable_menu_controls");
+    } else {
+        self thread menuButtons();
+    }
+}
 
 menuButtons()
 {
     self thread monitorOpen();
     self thread menuScrollUp();
     self thread menuScrollDown();
-    self thread menuSelect();
-    self thread menuBack();
+    self thread menuSliderLeft();
+    self thread menuSliderRight();
+    self thread dvarSliderLeft();
+    self thread dvarSliderRight();
+    self thread arrayLeft();
+    self thread arrayRight();
+    self thread bindLeft();
+    self thread bindRight();
+    self thread menuUse();
+    self thread menuClose();
 }
 
-// --- Open Menu: ADS + Dpad Up ---
 monitorOpen()
 {
     self endon("disconnect");
+    self endon("disable_menu_controls");
     self endon("death");
-    self notifyOnPlayerCommand("menuOpen", "+actionslot 1");
-
-    while(true)
+    self notifyOnPlayerCommand("menuOpen", "+actionslot 2");
+    for(;;)
     {
         self waittill("menuOpen");
         if(self adsButtonPressed())
         {
-            if(!self.menu.isopen)
-            {
+            if(!self.menu.isopen){
                 self.menu.isopen = true;
-                self loadMenu("Main");
-                self freezeControls(true);
+                self LoadMenu("AZZA");
             }
         }
     }
 }
 
-// --- Scroll Up: Dpad Up ---
 menuScrollUp()
 {
     self endon("disconnect");
+    self endon("disable_menu_controls");
     self endon("death");
     self notifyOnPlayerCommand("menuUp", "+actionslot 1");
-
-    while(true)
+    for(;;)
     {
         self waittill("menuUp");
-        if(self.menu.isopen && !self adsButtonPressed())
+        if(self.menu.isopen && self getPers("ufo") == "Off")
         {
             self.menu.scroll--;
-            if(self.menu.scroll < 0)
-                self.menu.scroll = self.menu.text[self.menu.current].size - 1;
-            self updateScroll();
+            wait 0.05;
+            self UpdateScroll();
         }
     }
+    wait 0.05;
 }
 
-// --- Scroll Down: Dpad Down ---
 menuScrollDown()
 {
     self endon("disconnect");
+    self endon("disable_menu_controls");
     self endon("death");
     self notifyOnPlayerCommand("menuDown", "+actionslot 2");
-
-    while(true)
+    for(;;)
     {
         self waittill("menuDown");
-        if(self.menu.isopen)
+        if(self.menu.isopen && self getPers("ufo") == "Off")
         {
             self.menu.scroll++;
-            if(self.menu.scroll >= self.menu.text[self.menu.current].size)
-                self.menu.scroll = 0;
-            self updateScroll();
+            wait 0.05;
+            self UpdateScroll();
+        }
+    }
+    wait 0.05;
+}
+
+menuSliderLeft()
+{
+    self endon("disconnect");
+    self endon("disable_menu_controls");
+    self endon("death");
+    self notifyOnPlayerCommand("slideLeft", "+actionslot 3");
+    for(;;)
+    {
+        self waittill("slideLeft");
+        if(self.menu.slidertype[self.menu.current][self.menu.scroll] == "slider" && self.menu.isopen)
+        {
+            pers = self.menu.pers[self.menu.current][self.menu.scroll];
+            value = self GetPers(pers);
+
+            value -= self.menu.amount[self.menu.current][self.menu.scroll];
+            if(value < self.menu.min[self.menu.current][self.menu.scroll])
+                value = self.menu.max[self.menu.current][self.menu.scroll];
+
+            self SetPers(pers, value);
+            self ExecuteFunction(self.menu.func[self.menu.current][self.menu.scroll], self GetPers(pers));
+            self LoadMenu(self.menu.current);
         }
     }
 }
 
-// --- Select: Use/Reload ---
-menuSelect()
+menuSliderRight()
 {
     self endon("disconnect");
+    self endon("disable_menu_controls");
     self endon("death");
-    self notifyOnPlayerCommand("menuSelect", "+usereload");
-
-    while(true)
+    self notifyOnPlayerCommand("slideRight", "+actionslot 4");
+    for(;;)
     {
-        self waittill("menuSelect");
-        if(self.menu.isopen)
+        self waittill("slideRight");
+        if(self.menu.slidertype[self.menu.current][self.menu.scroll] == "slider" && self.menu.isopen)
         {
-            func = self.menu.func[self.menu.current][self.menu.scroll];
-            input = self.menu.input[self.menu.current][self.menu.scroll];
+            pers = self.menu.pers[self.menu.current][self.menu.scroll];
+            value = self GetPers(pers);
 
-            if(isDefined(input))
-                self thread [[func]](input);
-            else
-                self thread [[func]]();
+            value += self.menu.amount[self.menu.current][self.menu.scroll];
+            if(value > self.menu.max[self.menu.current][self.menu.scroll])
+                value = self.menu.min[self.menu.current][self.menu.scroll];
+
+            self SetPers(pers, value);
+            self ExecuteFunction(self.menu.func[self.menu.current][self.menu.scroll], self GetPers(pers));
+            self LoadMenu(self.menu.current);
         }
     }
 }
 
-// --- Back/Close: Melee ---
-menuBack()
+dvarSliderLeft()
 {
     self endon("disconnect");
+    self endon("disable_menu_controls");
     self endon("death");
-    self notifyOnPlayerCommand("menuBack", "+melee");
-
-    while(true)
+    self notifyOnPlayerCommand("dvarLeft", "+actionslot 3");
+    for(;;)
     {
-        self waittill("menuBack");
+        self waittill("dvarLeft");
+        if(self.menu.slidertype[self.menu.current][self.menu.scroll] == "dvar" && self.menu.isopen)
+        {
+            dvar = self.menu.dvar[self.menu.current][self.menu.scroll];
+            value = GetDvarFloat(dvar);
+
+            value -= self.menu.amount[self.menu.current][self.menu.scroll];
+            if(value < self.menu.min[self.menu.current][self.menu.scroll])
+                value = self.menu.max[self.menu.current][self.menu.scroll];
+
+            SetDvar(dvar, value);
+            self ExecuteFunction(self.menu.func[self.menu.current][self.menu.scroll], GetDvarFloat(dvar));
+            self LoadMenu(self.menu.current);
+        }
+    }
+}
+
+dvarSliderRight()
+{
+    self endon("disconnect");
+    self endon("disable_menu_controls");
+    self endon("death");
+    self notifyOnPlayerCommand("dvarRight", "+actionslot 4");
+    for(;;)
+    {
+        self waittill("dvarRight");
+        if(self.menu.slidertype[self.menu.current][self.menu.scroll] == "dvar" && self.menu.isopen)
+        {
+            dvar = self.menu.dvar[self.menu.current][self.menu.scroll];
+            value = GetDvarFloat(dvar);
+
+            value += self.menu.amount[self.menu.current][self.menu.scroll];
+            if(value > self.menu.max[self.menu.current][self.menu.scroll])
+                value = self.menu.min[self.menu.current][self.menu.scroll];
+
+            SetDvar(dvar, value);
+            self ExecuteFunction(self.menu.func[self.menu.current][self.menu.scroll], GetDvarFloat(dvar));
+            self LoadMenu(self.menu.current);
+        }
+    }
+}
+
+arrayLeft()
+{
+    self endon("disconnect");
+    self endon("disable_menu_controls");
+    self endon("death");
+    self notifyOnPlayerCommand("arrayLeft", "+actionslot 3");
+    for(;;)
+    {
+        self waittill("arrayLeft");
+        if(self.menu.slidertype[self.menu.current][self.menu.scroll] == "array" && self.menu.isopen)
+        {
+            array = self.menu.array[self.menu.current][self.menu.scroll];
+            arrayname = self.menu.arrayname[self.menu.current][self.menu.scroll];
+            index = Int(self GetPers("arrayindex_" + arrayname));
+
+            index--;
+            if(index < 0)
+                index = array.size - 1;
+
+            self SetPers("arrayindex_" + arrayname, index);
+            self LoadMenu(self.menu.current);
+        }
+    }
+}
+
+arrayRight()
+{
+    self endon("disconnect");
+    self endon("disable_menu_controls");
+    self endon("death");
+    self notifyOnPlayerCommand("arrayRight", "+actionslot 4");
+    for(;;)
+    {
+        self waittill("arrayRight");
+        if(self.menu.slidertype[self.menu.current][self.menu.scroll] == "array" && self.menu.isopen)
+        {
+            array = self.menu.array[self.menu.current][self.menu.scroll];
+            arrayname = self.menu.arrayname[self.menu.current][self.menu.scroll];
+            index = Int(self GetPers("arrayindex_" + arrayname));
+
+            index++;
+            if(index >= array.size)
+                index = 0;
+
+            self SetPers("arrayindex_" + arrayname, index);
+            self LoadMenu(self.menu.current);
+        }
+    }
+}
+
+bindLeft()
+{
+    self endon("disconnect");
+    self endon("disable_menu_controls");
+    self endon("death");
+    self notifyOnPlayerCommand("bindLeft", "+actionslot 3");
+    for(;;)
+    {
+        self waittill("bindLeft");
+        if(self.menu.slidertype[self.menu.current][self.menu.scroll] == "bind" && self.menu.isopen)
+        {
+            pers = self.menu.pers[self.menu.current][self.menu.scroll];
+            self notify("stop" + pers);
+
+            switch(self GetPers(pers)) {
+                case "Off":
+                    self SetPers(pers, "+smoke");
+                    break;
+                case "+smoke":
+                    self SetPers(pers, "+frag");
+                    break;
+                case "+frag":
+                    self SetPers(pers, "+actionslot 4");
+                    break;
+                case "+actionslot 4":
+                    self SetPers(pers, "+actionslot 3");
+                    break;
+                case "+actionslot 3":
+                    self SetPers(pers, "+actionslot 2");
+                    break;
+                case "+actionslot 2":
+                    self SetPers(pers, "+actionslot 1");
+                    break;
+                case "+actionslot 1":
+                    self SetPers(pers, "Off");
+                    break;
+            }
+
+            if(self GetPers(pers) != "Off")
+                self ExecuteFunction(self.menu.func[self.menu.current][self.menu.scroll], self GetPers(pers), pers);
+            self LoadMenu(self.menu.current);
+        }
+    }
+}
+
+bindRight()
+{
+    self endon("disconnect");
+    self endon("disable_menu_controls");
+    self endon("death");
+    self notifyOnPlayerCommand("bindRight", "+actionslot 4");
+    for(;;)
+    {
+        self waittill("bindRight");
+        if(self.menu.slidertype[self.menu.current][self.menu.scroll] == "bind" && self.menu.isopen)
+        {
+            pers = self.menu.pers[self.menu.current][self.menu.scroll];
+            self notify("stop" + pers);
+
+            switch(self GetPers(pers)) {
+                case "Off":
+                    self SetPers(pers, "+actionslot 1");
+                    break;
+                case "+actionslot 1":
+                    self SetPers(pers, "+actionslot 2");
+                    break;
+                case "+actionslot 2":
+                    self SetPers(pers, "+actionslot 3");
+                    break;
+                case "+actionslot 3":
+                    self SetPers(pers, "+actionslot 4");
+                    break;
+                case "+actionslot 4":
+                    self SetPers(pers, "+frag");
+                    break;
+                case "+frag":
+                    self SetPers(pers, "+smoke");
+                    break;
+                case "+smoke":
+                    self SetPers(pers, "Off");
+                    break;
+            }
+
+            if(self GetPers(pers) != "Off")
+                self ExecuteFunction(self.menu.func[self.menu.current][self.menu.scroll], self GetPers(pers), pers);
+            self LoadMenu(self.menu.current);
+        }
+    }
+}
+
+menuUse()
+{
+    self endon("disconnect");
+    self endon("disable_menu_controls");
+    self endon("death");
+    self notifyOnPlayerCommand("menuUse", "+usereload");
+    for(;;)
+    {
+        self waittill("menuUse");
         if(self.menu.isopen)
         {
-            parent = self.menu.parent[self.menu.current];
-            if(parent == "exit")
-            {
-                // Close the menu entirely
-                self destroyMenu();
+            if(self.menu.slidertype[self.menu.current][self.menu.scroll] == "none") {
+                self ExecuteFunction(self.menu.func[self.menu.current][self.menu.scroll], self.menu.input[self.menu.current][self.menu.scroll], self.menu.input2[self.menu.current][self.menu.scroll]);
+                self LoadMenu(self.menu.current);
+            }
+            else if(self.menu.slidertype[self.menu.current][self.menu.scroll] == "array") {
+                arrayname = self.menu.arrayname[self.menu.current][self.menu.scroll];
+                self ExecuteFunction(self.menu.func[self.menu.current][self.menu.scroll], level.arrayscrolls[arrayname][Int(self GetPers("arrayindex_" + arrayname))]);
+                self LoadMenu(self.menu.current);
+            }
+        }
+    }
+}
+
+menuClose()
+{
+    self endon("disconnect");
+    self endon("disable_menu_controls");
+    self endon("death");
+    self notifyOnPlayerCommand("menuClose", "+melee");
+    for(;;)
+    {
+        self waittill("menuClose");
+        if(self.menu.isopen && self getPers("ufo") == "Off")
+        {
+            if(self.menu.parent[self.menu.current] == "exit") {
+                self DestroyMenuHud();
                 self.menu.isopen = false;
                 self freezeControls(false);
             }
-            else
-            {
-                // Go back to parent menu
-                self loadMenu(parent);
+            else {
+                self LoadMenu(self.menu.parent[self.menu.current]);
             }
         }
     }
 }
 
 // ============================================================
-// SCROLL / DISPLAY UPDATE
+// SCROLL UPDATE — Handles scrolling with overflow
 // ============================================================
 
-updateScroll()
-{
-    menu = self.menu.current;
-    total = self.menu.text[menu].size;
+UpdateScroll() {
+    if (self.menu.scroll < 0)
+        self.menu.scroll = self.menu.text[self.menu.current].size - 1;
 
-    for(i = 0; i < self.menu.maxsize; i++)
-    {
-        if(i < total)
-        {
-            self.hud["options"][i] setText(self.menu.text[menu][i]);
-            self.hud["values"][i] setText(self.menu.bool[menu][i]);
+    if (self.menu.scroll > self.menu.text[self.menu.current].size - 1)
+        self.menu.scroll = 0;
 
-            // Highlight selected option
-            if(i == self.menu.scroll)
-            {
-                self.hud["options"][i].color = self.menu.color["accent"];
-                self.hud["values"][i].color = self.menu.color["accent"];
-            }
+    if (!isdefined(self.menu.text[self.menu.current][self.menu.scroll - self.menu.maxsizehalf]) || self.menu.text[self.menu.current].size <= self.menu.maxsize) {
+        for (i = 0; i < self.menu.maxsize; i++) {
+            if (isdefined(self.menu.text[self.menu.current][i]))
+                self.hud["text"][i] SetSafeText(self.menu.text[self.menu.current][i]);
             else
-            {
-                self.hud["options"][i].color = self.menu.color["text"];
-                self.hud["values"][i].color = (0.7, 0.7, 0.7);
-            }
-        }
-        else
-        {
-            self.hud["options"][i] setText("");
-            self.hud["values"][i] setText("");
-        }
-    }
+                self.hud["text"][i] SetSafeText("");
 
-    // Move scrollbar to current position
-    if(isDefined(self.hud["scrollbar"]))
-    {
-        targetY = -105 + (self.menu.scroll * 22);
-        if(self.menu.smoothscroll)
-            self.hud["scrollbar"] moveOverTime(0.12);
-        self.hud["scrollbar"].y = targetY;
+            self.hud["bool_text"][i] SetSafeText(self.menu.bool[self.menu.current][i]);
+        }
+        self.hud["scroll"].y = -128 + (15 * self.menu.scroll);
+    }
+    else if (isdefined(self.menu.text[self.menu.current][self.menu.scroll + self.menu.maxsizehalf])) {
+        index = 0;
+        for (i = self.menu.scroll - self.menu.maxsizehalf; i < self.menu.scroll + self.menu.maxsizehalf; i++) {
+            if (isdefined(self.menu.text[self.menu.current][i]))
+                self.hud["text"][index] SetSafeText(self.menu.text[self.menu.current][i]);
+            else
+                self.hud["text"][index] SetSafeText("");
+
+            self.hud["bool_text"][index] SetSafeText(self.menu.bool[self.menu.current][i]);
+            index++;
+        }
+        self.hud["scroll"].y = -128 + (15 * self.menu.maxsizehalf);
+    }
+    else {
+        for (i = 0; i < self.menu.maxsize; i++) {
+            self.hud["text"][i] SetSafeText(self.menu.text[self.menu.current][self.menu.text[self.menu.current].size + i - self.menu.maxsize]);
+            self.hud["bool_text"][i] SetSafeText(self.menu.bool[self.menu.current][self.menu.bool[self.menu.current].size + i - self.menu.maxsize]);
+        }
+        self.hud["scroll"].y = -128 + (15 * (self.menu.scroll - self.menu.text[self.menu.current].size + self.menu.maxsize));
     }
 }

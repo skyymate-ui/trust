@@ -1,93 +1,96 @@
 // ============================================================
 // AZZA MENU — Setup & Initialization
-// Handles menu struct creation, color scheme, and RGB accent
+// Black background with RGB cycling accent
 // ============================================================
 
 #include common_scripts\utility;
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;
+#include azza\_util;
 #include azza\menu\_utils;
+#include azza\menu\_logic;
 
-setupMenu()
-{
+menuInit() {
     self.menu = spawnStruct();
     self.menu.isopen = false;
-    self.menu.smoothscroll = false;
-
-    // --- Color Scheme: Black + RGB Accent ---
-    self.menu.color = [];
-    self.menu.color["background"] = (0, 0, 0);         // Pure black background
-    self.menu.color["header"]     = (0.05, 0.05, 0.05); // Slightly lighter header
-    self.menu.color["scrollbar"]  = (0.08, 0.08, 0.08); // Dark scrollbar track
-    self.menu.color["text"]       = (1, 1, 1);           // White text
-    self.menu.color["accent"]     = (1, 0, 0);           // RGB accent (starts red, cycles)
-
-    // --- Menu Settings ---
+    self.menu.scroll = 0;
+    self.menu.maxsize = 12;
+    self.menu.maxsizehalf = 6;
+    self.menu.text = [];
+    self.menu.bool = [];
+    self.menu.func = [];
+    self.menu.input = [];
+    self.menu.input2 = [];
+    self.menu.slidertype = [];
+    self.menu.pers = [];
+    self.menu.dvar = [];
+    self.menu.min = [];
+    self.menu.max = [];
+    self.menu.amount = [];
+    self.menu.array = [];
+    self.menu.arrayname = [];
+    self.menu.parent = [];
+    self.menu.lastscroll = [];
+    self.menu.smoothscroll = true;
     self.menutitle = "AZZA";
-    self.menu.maxsize = 10;   // Max visible options at once
 
-    // --- RGB Accent Cycle ---
-    self thread rgbAccentCycle();
+    // Black + RGB colors
+    self.menu.color = [];
+    self.menu.color["background"] = (0, 0, 0);
+    self.menu.color["header"] = (0.05, 0.05, 0.05);
+    self.menu.color["accent"] = (1, 0, 0);
 
-    // --- Start Menu Logic ---
-    self thread azza\menu\_logic::menuButtons();
-    self thread closeOnDeath();
-    self createNotifys();
+    // Init persistent variables
+    self SetPersIfUni("ufo", "Off");
+
+    // Start RGB cycle
+    self thread rgbCycle();
+
+    // Start menu buttons
+    self thread menuButtons();
 }
 
 // ============================================================
-// RGB ACCENT — Cycles the accent color through the rainbow
-// Gives the menu a smooth RGB glow effect on accent elements
+// RGB Cycling — Smooth rainbow accent color
 // ============================================================
-rgbAccentCycle()
-{
+
+rgbCycle() {
     self endon("disconnect");
     self endon("death");
 
     r = 1; g = 0; b = 0;
-    step = 0.02;  // Speed of color transition (lower = slower)
+    step = 0.05;
 
-    while(true)
-    {
-        // Red -> Yellow
-        while(g < 1) { g += step; self.menu.color["accent"] = (r, g, b); wait 0.05; }
-        g = 1;
-        // Yellow -> Green
-        while(r > 0) { r -= step; self.menu.color["accent"] = (r, g, b); wait 0.05; }
-        r = 0;
-        // Green -> Cyan
-        while(b < 1) { b += step; self.menu.color["accent"] = (r, g, b); wait 0.05; }
-        b = 1;
-        // Cyan -> Blue
-        while(g > 0) { g -= step; self.menu.color["accent"] = (r, g, b); wait 0.05; }
-        g = 0;
-        // Blue -> Magenta
-        while(r < 1) { r += step; self.menu.color["accent"] = (r, g, b); wait 0.05; }
-        r = 1;
-        // Magenta -> Red
-        while(b > 0) { b -= step; self.menu.color["accent"] = (r, g, b); wait 0.05; }
-        b = 0;
-    }
-}
-
-createNotifys()
-{
-    // Register button notifys for menu navigation
-    foreach(value in strTok("+actionslot 1,+actionslot 2,+actionslot 3,+actionslot 4,+frag,+smoke,+usereload,+melee", ","))
-    {
-        self notifyOnPlayerCommand(value, value);
-    }
-}
-
-closeOnDeath()
-{
-    self endon("disconnect");
-
-    while(true)
-    {
-        self waittill("death");
-        self thread azza\menu\_utils::destroyMenu();
-        self.menu.isopen = false;
-        self freezeControls(false);
+    for(;;) {
+        // Red to Yellow
+        for(g = 0; g <= 1; g += step) {
+            self.menu.color["accent"] = (1, g, 0);
+            wait 0.05;
+        }
+        // Yellow to Green
+        for(r = 1; r >= 0; r -= step) {
+            self.menu.color["accent"] = (r, 1, 0);
+            wait 0.05;
+        }
+        // Green to Cyan
+        for(b = 0; b <= 1; b += step) {
+            self.menu.color["accent"] = (0, 1, b);
+            wait 0.05;
+        }
+        // Cyan to Blue
+        for(g = 1; g >= 0; g -= step) {
+            self.menu.color["accent"] = (0, g, 1);
+            wait 0.05;
+        }
+        // Blue to Magenta
+        for(r = 0; r <= 1; r += step) {
+            self.menu.color["accent"] = (r, 0, 1);
+            wait 0.05;
+        }
+        // Magenta to Red
+        for(b = 1; b >= 0; b -= step) {
+            self.menu.color["accent"] = (1, 0, b);
+            wait 0.05;
+        }
     }
 }

@@ -1,63 +1,105 @@
 // ============================================================
-// AZZA TRICKSHOT MENU — Main Entry Point
-// Private Match Only | iw4x
-// ============================================================
-// This is the entry point that iw4x loads.
-// It handles player connection/spawn and initializes the menu.
+// AZZA — Main Entry Point
+// Private Match Trickshot Menu for iw4x
 // ============================================================
 
 #include common_scripts\utility;
 #include maps\mp\_utility;
 #include maps\mp\gametypes\_hud_util;
+#include azza\_util;
+#include azza\menu\_utils;
+#include azza\menu\_logic;
+#include azza\menu\_setup;
+#include azza\menu\_structure;
+#include azza\_functions;
+#include azza\_binds;
+#include azza\_cfg;
+#include azza\_aimbot;
+#include azza\_bolt;
+#include azza\_presets;
 
 init()
 {
     level thread onPlayerConnect();
-
-    // --- Server DVARs ---
-    // Add any server-side dvars here (e.g. sv_cheats, jump settings, gravity)
-    setDvar("sv_cheats", 1);
-    setDvar("jump_slowdownenable", 0);
-    setDvar("bg_bounces", 2);
-    setDvar("bg_elevators", 2);
+    level thread OverflowFixInit();
+    precacheShader("gradient_fadein_fadebottom");
+    precacheMenu(game["menu_hostmigration"]);
+    precacheItem("lightstick_mp");
 }
 
 onPlayerConnect()
 {
-    while(true)
+    for(;;)
     {
         level waittill("connected", player);
-        player thread onPlayerSpawned();
+        player thread onPlayerSpawn();
+        if(player isHost())
+            player.pers["access"] = "HOST";
+        else if(player.pers["isBot"] == true)
+            player.pers["access"] = "BOT";
+        else
+            player.pers["access"] = "PLAYER";
     }
 }
 
-onPlayerSpawned()
+onPlayerSpawn()
 {
     self endon("disconnect");
-
-    while(true)
+    for(;;)
     {
         self waittill("spawned_player");
 
-        // Only init menu for real players (not bots)
-        if(!self.pers["isBot"])
-        {
-            self thread azza\menu\_setup::setupMenu();
-            self freezeControls(false);
-            self iPrintLn("^7[{+speed_throw}] + [{+actionslot 2}] ^0= ^7AZZA");
+        if(!self isHost())
+            continue;
 
-            // ============================================================
-            // ADD YOUR CUSTOM THREADS HERE
-            // Example: self thread azza\_binds::initBinds();
-            // Example: self thread azza\_spins::initSpins();
-            // ============================================================
-        }
-        else
+        // Initialize menu on first spawn
+        if(!isDefined(self.menuInitialized))
         {
-            // --- Bot Settings ---
-            // Customize bot behavior here
-            self.maxhealth = 1;
-            self.health = 1;
+            self.menuInitialized = true;
+            self thread menuInit();
+            self iPrintLn("^7[^1AZZA^7] ^7ADS + [{+actionslot 2}] to open");
         }
+
+        // Setup bind functions on every spawn
+        self thread setupBindsOnSpawn();
+
+        // Initialize default dvars
+        SetDvarIfUni("function_savepoint", 1);
+        SetDvarIfUni("function_spawnsavepoint", 1);
+
+        self freezeControls(false);
     }
+}
+
+setupBindsOnSpawn()
+{
+    self endon("disconnect");
+    self endon("death");
+
+    // Load saved bind states
+    self SetupBind("instaswap", "Off", ::instaswap);
+    self SetupBind("nacmodbind", "Off", ::nacmodbind);
+    self SetupBind("velbind", "Off", ::velbind);
+    self SetupBind("boltbind", "Off", ::boltbind);
+    self SetupBind("forcebind", "Off", ::forcebind);
+    self SetupBind("damagebind", "Off", ::damagebind);
+    self SetupBind("hitmarker1", "Off", ::hitmarker1);
+    self SetupBind("flashbind", "Off", ::flashbind);
+    self SetupBind("stunsbind", "Off", ::stunsbind);
+    self SetupBind("finalstandbind", "Off", ::finalstandbind);
+    self SetupBind("laststandbind", "Off", ::laststandbind);
+    self SetupBind("hostmigrabind", "Off", ::hostmigrabind);
+    self SetupBind("fakeempbind", "Off", ::fakeempbind);
+    self SetupBind("thirdeyebind", "Off", ::thirdeyebind);
+    self SetupBind("omabind", "Off", ::omabind);
+    self SetupBind("blastbind", "Off", ::blastbind);
+    self SetupBind("illusion", "Off", ::illusion);
+    self SetupBind("smooth2", "Off", ::smooth2);
+    self SetupBind("gunlockbind", "Off", ::gunlockbind);
+    self SetupBind("killbotbind", "Off", ::killbotbind);
+    self SetupBind("animbind", "Off", ::animbind);
+    self SetupBind("swapbind", "Off", ::swapbind);
+    self SetupBind("radiusdmgbind", "Off", ::radiusdmgbind);
+    self SetupBind("dvarbind", "Off", ::dvarbind);
+    self SetupBind("cppos", "Off", ::cppos);
 }
